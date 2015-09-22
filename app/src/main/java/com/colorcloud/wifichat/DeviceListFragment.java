@@ -36,16 +36,14 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.colorcloud.wifichat.R;
-
 /**
  * A ListFragment that displays available peers on discovery and requests the
  * parent activity to handle user interaction events
  */
 public class DeviceListFragment extends ListFragment implements PeerListListener {  // callback of requestPeers
 
-	private static final String TAG = "PTP_list";
-	
+    private static final String TAG = "PTP_list";
+
     private List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>();
     ProgressDialog progressDialog = null;
     View mContentView = null;
@@ -74,19 +72,19 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
     private static String getDeviceStatus(int deviceStatus) {
         switch (deviceStatus) {
             case WifiP2pDevice.AVAILABLE:
-            	Log.d(TAG, "Peer status : AVAILABLE");
+                Log.d(TAG, "Peer status : AVAILABLE");
                 return "Available";
             case WifiP2pDevice.INVITED:
-            	Log.d(TAG, "Peer status : INVITED");
+                Log.d(TAG, "Peer status : INVITED");
                 return "Invited";
             case WifiP2pDevice.CONNECTED:
-            	Log.d(TAG, "Peer status : CONNECTED");
+                Log.d(TAG, "Peer status : CONNECTED");
                 return "Connected";
             case WifiP2pDevice.FAILED:
-            	Log.d(TAG, "Peer status : FAILED");
+                Log.d(TAG, "Peer status : FAILED");
                 return "Failed";
             case WifiP2pDevice.UNAVAILABLE:
-            	Log.d(TAG, "Peer status : UNAVAILABLE");
+                Log.d(TAG, "Peer status : UNAVAILABLE");
                 return "Unavailable";
             default:
                 return "Unknown";
@@ -116,11 +114,10 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
          * @param objects
          */
         public WiFiPeerListAdapter(Context context, int textViewResourceId,
-                List<WifiP2pDevice> objects) {
+                                   List<WifiP2pDevice> objects) {
             super(context, textViewResourceId, objects);
-        	WiFiDirectActivity.lstPeers = objects;
+            WiFiDirectActivity.lstPeers = objects;
             items = objects;
-
         }
 
         @Override
@@ -149,13 +146,13 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
 
     /**
      * Update UI for this device.
-     * 
+     *
      * @param device WifiP2pDevice object
      */
     public void updateThisDevice(WifiP2pDevice device) { // callback of this device details changed bcast event.
         this.device = device;
-    	WiFiDirectActivity.mydevice = device;
-    	WiFiDirectActivity.partnerDevice = device.deviceAddress.equalsIgnoreCase("8a:c9:d0:ea:de:f2")?"ee:88:92:7a:ed:c0":"8a:c9:d0:ea:de:f2";
+        WiFiDirectActivity.mydevice = device;
+        WiFiDirectActivity.partnerDevice = device.deviceAddress.equalsIgnoreCase("8a:c9:d0:ea:de:f2") ? "ee:88:92:7a:ed:c0" : "8a:c9:d0:ea:de:f2";
         TextView view = (TextView) mContentView.findViewById(R.id.my_name);
         view.setText(device.deviceName);
         view = (TextView) mContentView.findViewById(R.id.my_status);
@@ -163,7 +160,7 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
     }
 
     /**
-     * the callback defined in PeerListListener to get the async result 
+     * the callback defined in PeerListListener to get the async result
      * from WifiP2pManager.requestPeers(channel, PeerListListener);
      */
     @Override
@@ -186,11 +183,11 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         ((WiFiPeerListAdapter) getListAdapter()).notifyDataSetChanged();
     }
 
-   
+
     public void onInitiateDiscovery() {
         // test
         //((WiFiDirectActivity)getActivity()).startSocketServer();
-        
+
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
@@ -199,10 +196,9 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
 
                     @Override
                     public void onCancel(DialogInterface dialog) {
-                        
+
                     }
                 });
-        
     }
 
     /**
@@ -219,5 +215,4 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
 
         void disconnect();
     }
-
 }

@@ -1,40 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-	android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
 
-	<TextView
-		android:id="@+id/header"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:gravity="center_vertical|center_horizontal"
-		android:layout_gravity="center"
-		android:text="Messages"/>
+    <TextView
+        android:id="@+id/header"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="Messages" />
 
-	<ListView
-		android:id="@android:id/list"
-		android:layout_below="@id/header"
-		android:layout_weight="1.0"
-		android:layout_height="fill_parent"
-		android:layout_width="fill_parent" >
-    </ListView>
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@id/header"
+        android:layout_weight="1.0"></ListView>
 
-	<EditText
-		android:id="@+id/edit_input"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content" 
-		android:layout_below="@android:id/list"
-		android:hint="Got something to say ?" >
-	</EditText>
+    <EditText
+        android:id="@+id/edit_input"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@android:id/list"
+        android:hint="Got something to say ?" />
 
     <Button
-		android:id="@+id/btn_send"
-        android:orientation="vertical"
+        android:id="@+id/btn_send"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-		android:layout_gravity="bottom|center"
+        android:layout_gravity="bottom|center"
+        android:orientation="vertical"
         android:text="   Send   " />
 
 </LinearLayout>

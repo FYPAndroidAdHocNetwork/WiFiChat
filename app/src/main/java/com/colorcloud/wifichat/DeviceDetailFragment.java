@@ -16,14 +16,6 @@
 
 package com.colorcloud.wifichat;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
@@ -45,7 +37,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.colorcloud.wifichat.DeviceListFragment.DeviceActionListener;
-import com.colorcloud.wifichat.R;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 /**
  * A fragment that manages a particular peer and allows interaction with device
@@ -53,8 +52,8 @@ import com.colorcloud.wifichat.R;
  */
 public class DeviceDetailFragment extends Fragment implements ConnectionInfoListener {
 
-	private static final String TAG = "PTP_Detail";
-	
+    private static final String TAG = "PTP_Detail";
+
     protected static final int CHOOSE_FILE_RESULT_CODE = 20;
     private View mContentView = null;
     private WifiP2pDevice device;
@@ -65,18 +64,18 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
-    
+
     @Override
-    public void onAttach(Activity activity){
-    	super.onAttach(activity);
-    	// onAttach -> onCreate -> onCreateView -> onActivityCreated -> onStart -> onResume
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        // onAttach -> onCreate -> onCreateView -> onActivityCreated -> onStart -> onResume
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         mContentView = inflater.inflate(R.layout.device_detail, null);
-        
+
         // connect button, per
         mContentView.findViewById(R.id.btn_connect).setOnClickListener(new View.OnClickListener() {
 
@@ -97,7 +96,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 //                                ((DeviceActionListener) getActivity()).cancelDisconnect();
 //                            }
 //                        }
-                        );
+                );
                 // perform p2p connect upon user click the connect button, connect available handle when connection done.
                 ((DeviceActionListener) getActivity()).connect(config);
 
@@ -123,13 +122,13 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
                         intent.setType("image/*");
                         //startActivityForResult(intent, CHOOSE_FILE_RESULT_CODE);
                         Log.d(TAG, "start_client button clicked, start chat activity !");
-                        ((WiFiDirectActivity)getActivity()).startChatActivity(null);  // no init msg if started from button click.
+                        ((WiFiDirectActivity) getActivity()).startChatActivity(null);  // no init msg if started from button click.
                     }
                 });
 
-        if(WiFiDirectActivity.partnerDevice != null){
-	        if(device.deviceAddress == WiFiDirectActivity.partnerDevice){
-	        	WifiP2pConfig config = new WifiP2pConfig();
+        if (WiFiDirectActivity.partnerDevice != null) {
+            if (device.deviceAddress == WiFiDirectActivity.partnerDevice) {
+                WifiP2pConfig config = new WifiP2pConfig();
                 config.deviceAddress = device.deviceAddress;
                 config.wps.setup = WpsInfo.PBC;
                 if (progressDialog != null && progressDialog.isShowing()) {
@@ -144,10 +143,10 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 //                                ((DeviceActionListener) getActivity()).cancelDisconnect();
 //                            }
 //                        }
-                        );
+                );
                 // perform p2p connect upon user click the connect button, connect available handle when connection done.
                 ((DeviceActionListener) getActivity()).connect(config);
-	        }
+            }
         }
         return mContentView;
     }
@@ -183,7 +182,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         TextView view = (TextView) mContentView.findViewById(R.id.group_owner);
         view.setText(getResources().getString(R.string.group_owner_text)
                 + ((info.isGroupOwner == true) ? getResources().getString(R.string.yes)
-                        : getResources().getString(R.string.no)));
+                : getResources().getString(R.string.no)));
 
         // InetAddress from WifiP2pInfo struct.
         view = (TextView) mContentView.findViewById(R.id.device_info);
@@ -195,27 +194,27 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         Log.d(TAG, "onConnectionInfoAvailable: " + info.groupOwnerAddress.getHostAddress());
         if (info.groupFormed && info.isGroupOwner) {
             //new FileServerAsyncTask(getActivity(), mContentView.findViewById(R.id.status_text)).execute();
-        	Log.d(TAG, "onConnectionInfoAvailable: device is groupOwner: startSocketServer ");
-        	((WiFiChatApp)getActivity().getApplication()).startSocketServer();
+            Log.d(TAG, "onConnectionInfoAvailable: device is groupOwner: startSocketServer ");
+            ((WiFiChatApp) getActivity().getApplication()).startSocketServer();
         } else if (info.groupFormed) {
-        	Log.d(TAG, "onConnectionInfoAvailable: device is client, connect to group owner: startSocketClient ");
-        	((WiFiChatApp)getActivity().getApplication()).startSocketClient(info.groupOwnerAddress.getHostAddress());
+            Log.d(TAG, "onConnectionInfoAvailable: device is client, connect to group owner: startSocketClient ");
+            ((WiFiChatApp) getActivity().getApplication()).startSocketClient(info.groupOwnerAddress.getHostAddress());
             // The other device acts as the client. In this case, we enable the get file button.
             //mContentView.findViewById(R.id.btn_start_client).setVisibility(View.VISIBLE);
             ((TextView) mContentView.findViewById(R.id.status_text)).setText(getResources().getString(R.string.client_text));
         }
-        
+
         // hide the connect button
         mContentView.findViewById(R.id.btn_connect).setVisibility(View.GONE);
         mContentView.findViewById(R.id.btn_start_client).setVisibility(View.VISIBLE);  // enable start chat button
-        
+
         Log.d(TAG, "onConnectionInfoAvailable: socket connection established, show start chat button ! ");
-        ((WiFiDirectActivity)getActivity()).onP2pConnected();  // p2p connected, socket server and client selector started.
+        ((WiFiDirectActivity) getActivity()).onP2pConnected();  // p2p connected, socket server and client selector started.
     }
 
     /**
      * Updates the UI with device data
-     * 
+     *
      * @param device the device to be displayed
      */
     public void showDetails(WifiP2pDevice device) {
@@ -269,11 +268,11 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
             try {
                 ServerSocket serverSocket = new ServerSocket(8988);
                 Log.d(WiFiDirectActivity.TAG, "Server: Socket opened");
-                
+
                 Socket client = serverSocket.accept();
                 Log.d(WiFiDirectActivity.TAG, "Server: connection done");
-                
-                
+
+
                 final File f = new File(Environment.getExternalStorageDirectory() + "/"
                         + context.getPackageName() + "/wifip2pshared-" + System.currentTimeMillis()
                         + ".jpg");
