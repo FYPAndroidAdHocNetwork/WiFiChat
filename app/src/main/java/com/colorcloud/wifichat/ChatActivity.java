@@ -181,22 +181,16 @@ public class ChatActivity extends Activity {
     /**
      * post send msg to service to handle it in background.
      */
-    // TODO: 5/10/15 for ACK msg, messageType is ACK
-    public void pushOutMessage(String jsonString, int messageType) {
+    public void pushOutMessage(String jsonString) {
         try {
             Log.d("######", "ChatActivity - pushOutMessage: " + jsonString);
             Message msg = ConnectionService.getInstance().getHandler().obtainMessage();
-            msg.what = messageType;
+            msg.what = MSG_PUSHOUT_DATA;
             msg.obj = jsonString;
-
             ConnectionService.getInstance().getHandler().sendMessage(msg);
         } catch (Exception e) {
             Toast.makeText(this, "Push Out Msg Failed", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    public void pushOutMessage(String jsonString) {
-        pushOutMessage(jsonString, MSG_PUSHOUT_DATA);
     }
 
     /**

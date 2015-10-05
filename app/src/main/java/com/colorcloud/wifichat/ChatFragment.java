@@ -88,7 +88,7 @@ public class ChatFragment extends ListFragment {
                     InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(inputEditText.getWindowToken(), 0);
 
-                    String formatedmsg = appendChatMessage(new MsgRow(mMyAddr, inputMsg));
+                    String formatedmsg = appendChatMessage(new MsgRow(mMyAddr, inputMsg, null));
                     Log.d(TAG, "sendButton clicked: sendOut data : " + formatedmsg);
                     mActivity.pushOutMessage(formatedmsg);
                 } else
@@ -121,7 +121,7 @@ public class ChatFragment extends ListFragment {
             mMessageList.add(msgRow);
             Log.d(TAG, "onCreate : " + msgRow.getMsg());
         } else if (mMessageList.size() == 0) {
-            mMessageList.add(new MsgRow(mMyAddr, mMyAddr + " logged in"));
+            mMessageList.add(new MsgRow(mMyAddr, mMyAddr + " logged in", null));
         }
         setListAdapter(mAdapter);  // list fragment data adapter 
 
