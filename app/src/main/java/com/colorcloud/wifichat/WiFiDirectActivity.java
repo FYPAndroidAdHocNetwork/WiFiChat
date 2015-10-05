@@ -294,12 +294,12 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
             // we will try once more,
             if (manager != null && !retryChannel) {
-                Toast.makeText(this, "Channel lost. Trying again", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Channel lost. Trying again", Toast.LENGTH_LONG).show();
                 resetData();
                 retryChannel = true;
                 manager.initialize(this, getMainLooper(), this);
             } else {
-                Toast.makeText(this, "Severe! Channel is probably lost premanently. Try Disable/Re-Enable P2P.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Severe! Channel is probably lost premanently. Try Disable/Re-Enable P2P.", Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
             Toast.makeText(this, "Channel disconnected Failed", Toast.LENGTH_SHORT).show();
