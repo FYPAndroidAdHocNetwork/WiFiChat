@@ -93,7 +93,7 @@ public class ChatFragment extends ListFragment {
                     InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(inputEditText.getWindowToken(), 0);
 
-                    String formatedmsg = appendChatMessage(new MsgRow(mMyAddr, inputMsg, null));
+                    String formatedmsg = appendChatMessage(new MsgRow(mMyAddr, inputMsg));
                     Log.d(TAG, "sendButton clicked: sendOut data : " + formatedmsg);
                     mActivity.pushOutMessage(formatedmsg);
                 } else
@@ -126,7 +126,7 @@ public class ChatFragment extends ListFragment {
             mMessageList.add(row);
             Log.d(TAG, "onCreate : " + row.mMsg);
         } else if (mMessageList.size() == 0) {
-            mMessageList.add(new MsgRow(mMyAddr, mMyAddr + " logged in", null));
+            mMessageList.add(new MsgRow(mMyAddr, mMyAddr + " logged in"));
         }
         setListAdapter(mAdapter);  // list fragment data adapter 
 
@@ -228,13 +228,9 @@ public class ChatFragment extends ListFragment {
             this.mMsg = null;
         }
 
-        public MsgRow(String sender, String msg, String time) {
-            mTime = time;
-            if (time == null) {
-                Date now = new Date();
-                //SimpleDateFormat timingFormat = new SimpleDateFormat("mm/dd hh:mm");
-                mTime = new SimpleDateFormat("dd/MM HH:mm").format(now);
-            }
+        public MsgRow(String sender, String msg) {
+            Date now = new Date();
+            mTime = new SimpleDateFormat("dd-M-yyyy hh:mm:ss").format(now);
             mSender = sender;
             mMsg = msg;
         }
