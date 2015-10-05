@@ -53,6 +53,8 @@ public class ChatFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         mMyAddr = ((WiFiChatApp) mActivity.getApplication()).mMyAddr;
 
+        ConnectionManager.setMyAddr(mMyAddr);
+
         setRetainInstance(true);   // Tell the framework to try to keep this fragment around during a configuration change.
     }
 

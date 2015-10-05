@@ -39,6 +39,8 @@ public class ConnectionManager {
     String mClientAddr = null;
     String mServerAddr = null;
 
+    private static String myAddr;
+
     /**
      * constructor
      */
@@ -269,9 +271,6 @@ public class ConnectionManager {
      * client send data into server, server pub to all clients.
      */
     public void onDataIn(SocketChannel schannel, String data) {
-        Log.d("######", "ConnectionManager - onDataIn:" + data);
-
-
 
         //Toast.makeText(this.mContext,"connection onDataIn : " + data,  Toast.LENGTH_SHORT).show();
         if (mIsServer) {  // push all _other_ clients if the device is the server
@@ -306,7 +305,6 @@ public class ConnectionManager {
      * server publish data to all the connected clients
      */
     private void pubDataToAllClients(String msg, SocketChannel incomingChannel) {
-        Log.d("######", "ConnectionManager - pubDataToAllClients : isServer: " + mIsServer + ", msg: " + msg);
         //Toast.makeText(this.mContext,"pubDataToAllClients : isServer ? " + mIsServer + " msg: " + msg ,  Toast.LENGTH_SHORT).show();
         if (!mIsServer) {
 //            Log.d(TAG, "pubDataToAllClients : not server");
@@ -332,7 +330,6 @@ public class ConnectionManager {
      * If the device is server, it just pub the data to all clients for now.
      */
     public int pushOutData(String jsonString) {
-        Log.d("######", "ConnectionManager - pushOutData: " + jsonString);
         if (!mIsServer) {   // device is client, can only send to server
             sendDataToServer(jsonString);
         } else {
@@ -346,7 +343,6 @@ public class ConnectionManager {
      * whenever client write to server, carry the format of "client_addr : msg "
      */
     private int sendDataToServer(String jsonString) {
-        Log.d("######", "ConnectionManager - sendDataToServer: " + jsonString);
         if (mClientSocketChannel == null) {
 //            Log.d(TAG, "sendDataToServer: channel not connected ! waiting...");
             //Toast.makeText(this.mContext,"sendDataToServer: channel not connected ! waiting...",  Toast.LENGTH_SHORT).show();
@@ -355,5 +351,13 @@ public class ConnectionManager {
 //        Log.d(TAG, "sendDataToServer: " + mClientAddr + " -> " + mClientSocketChannel.socket().getInetAddress().getHostAddress() + " : " + jsonString);
         //Toast.makeText(this.mContext,"sendDataToServer: " + mClientAddr + " -> " + mClientSocketChannel.socket().getInetAddress().getHostAddress() + " : " +  jsonString,  Toast.LENGTH_SHORT).show();
         return writeData(mClientSocketChannel, jsonString);
+    }
+
+    public static String getMyAddr() {
+        return myAddr;
+    }
+
+    public static void setMyAddr(String myAddr) {
+        ConnectionManager.myAddr = myAddr;
     }
 }
