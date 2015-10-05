@@ -5,8 +5,6 @@ import android.app.ListFragment;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,11 +16,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  * chat fragment attached to main activity.
@@ -70,7 +65,7 @@ public class ChatFragment extends ListFragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList("MSG_LIST", mMessageList);
-        Log.d(TAG, "onSaveInstanceState. " + mMessageList.get(0).mMsg);
+        Log.d(TAG, "onSaveInstanceState. " + mMessageList.get(0).getMsg());
     }
 
     /**
@@ -108,7 +103,7 @@ public class ChatFragment extends ListFragment {
 
         if (savedInstanceState != null) {
             mMessageList = savedInstanceState.getParcelableArrayList("MSG_LIST");
-            Log.d(TAG, "onCreate : savedInstanceState: " + mMessageList.get(0).mMsg);
+            Log.d(TAG, "onCreate : savedInstanceState: " + mMessageList.get(0).getMsg());
         } else if (mMessageList == null) {
             // no need to setContentView, just setListAdapter, but listview must be android:id="@android:id/list"
             mMessageList = new ArrayList<MsgRow>(200);
@@ -122,9 +117,9 @@ public class ChatFragment extends ListFragment {
         Log.d(TAG, "onCreate chat msg fragment: my_addr: " + mMyAddr + " : " + initmsg);
 
         if (initmsg != null) {
-            MsgRow row = MsgRow.parseMsgRow(initmsg);
-            mMessageList.add(row);
-            Log.d(TAG, "onCreate : " + row.mMsg);
+            MsgRow msgRow = MsgRow.parseMsgRow(initmsg);
+            mMessageList.add(msgRow);
+            Log.d(TAG, "onCreate : " + msgRow.getMsg());
         } else if (mMessageList.size() == 0) {
             mMessageList.add(new MsgRow(mMyAddr, mMyAddr + " logged in"));
         }
@@ -189,16 +184,16 @@ public class ChatFragment extends ListFragment {
             }
 
             TextView sender = (TextView) view.findViewById(R.id.sender);
-            sender.setText(item.mSender);
+            sender.setText(item.getSender());
 
             TextView msgRow = (TextView) view.findViewById(R.id.msg_row);
-            msgRow.setText(item.mMsg);
+            msgRow.setText(item.getMsg());
 
             TextView time = (TextView) view.findViewById(R.id.time);
-            time.setText(item.mTime);
+            time.setText(item.getTime());
 
             // set the background color
-            if (!item.mSender.equals(mMyAddr)) {
+            if (!item.getSender().equals(mMyAddr)) {
                 // view.setBackgroundResource(R.drawable.row_bkgrd);
                 msgRow.setTextColor(Color.GREEN);
                 sender.setTextColor(Color.GREEN);
@@ -208,89 +203,8 @@ public class ChatFragment extends ListFragment {
             }
             time.setTextColor(Color.BLUE);
 
-            Log.d(TAG, "getView : " + item.mSender + " " + item.mMsg + " " + item.mTime);
+            Log.d(TAG, "getView : " + item.getSender() + " " + item.getMsg() + " " + item.getTime());
             return view;
-        }
-    }
-
-    /**
-     * msg row format
-     */
-    public static class MsgRow implements Parcelable {
-        public String mSender;
-        public String mMsg;
-        public String mTime;
-        public static final String mDel = "^&^";
-
-        private MsgRow() {
-            this.mSender = null;
-            this.mTime = null;
-            this.mMsg = null;
-        }
-
-        public MsgRow(String sender, String msg) {
-            Date now = new Date();
-            mTime = new SimpleDateFormat("dd-M-yyyy hh:mm:ss").format(now);
-            mSender = sender;
-            mMsg = msg;
-        }
-
-        public MsgRow(Parcel in) {
-            readFromParcel(in);
-        }
-
-        public String toString() {
-            return mSender + mDel + mMsg + mDel + mTime;
-        }
-
-        public static MsgRow parseMsgRow(String formattedMsg) {
-            StringTokenizer st = new StringTokenizer(formattedMsg, mDel);
-            MsgRow row = new MsgRow();
-            while (st.hasMoreTokens()) {
-                // Order matters
-                if (row.mSender == null) {
-                    row.mSender = st.nextToken();
-                    continue;
-                }
-                if (row.mMsg == null) {
-                    row.mMsg = st.nextToken();
-                    continue;
-                }
-                if (row.mTime == null) {
-                    row.mTime = st.nextToken();
-                    break;  // done
-                }
-            }
-            Log.d(TAG, "parseMsgRow : " + row.mMsg);
-            return row;
-        }
-
-        public static final Parcelable.Creator<MsgRow> CREATOR = new Parcelable.Creator<MsgRow>() {
-            public MsgRow createFromParcel(Parcel in) {
-                return new MsgRow(in);
-            }
-
-            public MsgRow[] newArray(int size) {
-                return new MsgRow[size];
-            }
-        };
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            dest.writeString(mSender);
-            dest.writeString(mMsg);
-            dest.writeString(mTime);
-        }
-
-        public void readFromParcel(Parcel in) {
-            mSender = in.readString();
-            mMsg = in.readString();
-            mTime = in.readString();
         }
     }
 }

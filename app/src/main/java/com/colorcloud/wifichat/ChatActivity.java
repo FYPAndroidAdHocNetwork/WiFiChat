@@ -14,8 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.colorcloud.wifichat.ChatFragment.MsgRow;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -183,16 +181,22 @@ public class ChatActivity extends Activity {
     /**
      * post send msg to service to handle it in background.
      */
-    public void pushOutMessage(String jsonstring) {
+    // TODO: 5/10/15 for ACK msg, messageType is ACK
+    public void pushOutMessage(String jsonString, int messageType) {
         try {
-            Log.d(TAG, "pushOutMessage : " + jsonstring);
+            Log.d("######", "ChatActivity - pushOutMessage: " + jsonString);
             Message msg = ConnectionService.getInstance().getHandler().obtainMessage();
-            msg.what = MSG_PUSHOUT_DATA;
-            msg.obj = jsonstring;
+            msg.what = messageType;
+            msg.obj = jsonString;
+
             ConnectionService.getInstance().getHandler().sendMessage(msg);
         } catch (Exception e) {
             Toast.makeText(this, "Push Out Msg Failed", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void pushOutMessage(String jsonString) {
+        pushOutMessage(jsonString, MSG_PUSHOUT_DATA);
     }
 
     /**
@@ -200,10 +204,10 @@ public class ChatActivity extends Activity {
      */
     public void showMessage(String msg) {
         try {
-            MsgRow row = ChatFragment.MsgRow.parseMsgRow(msg);
-            Log.d(TAG, "showMessage : " + msg + " : " + row.mMsg);
+            MsgRow msgRow = MsgRow.parseMsgRow(msg);
+            Log.d(TAG, "showMessage : " + msg + " : " + msgRow.getMsg());
             if (mChatFrag != null) {
-                mChatFrag.appendChatMessage(row);
+                mChatFrag.appendChatMessage(msgRow);
             }
         } catch (Exception e) {
             Toast.makeText(this, "Show Msg Failed", Toast.LENGTH_SHORT).show();
