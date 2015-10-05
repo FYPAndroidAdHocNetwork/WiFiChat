@@ -27,7 +27,7 @@ import static com.colorcloud.wifichat.Constant.MSG_SELECT_ERROR;
  */
 
 public class SelectorAsyncTask extends AsyncTask<Void, Void, Void> {
-//    private static final String TAG = "PTP_SEL";
+    private static final String TAG = "SelectorAsyncTask";
 
     private ConnectionService mConnService;
     private Selector mSelector;
@@ -63,11 +63,11 @@ public class SelectorAsyncTask extends AsyncTask<Void, Void, Void> {
                         processSelectionKey(mSelector, selKey);  // process the selection key.
                     } catch (IOException e) {
                         selKey.cancel();
-//                        Log.e(TAG, "select : io exception in processing selector event: " + e.toString());
+                        Log.e(TAG, "select : io exception in processing selector event: " + e.toString());
                     }
                 }
             } catch (Exception e) {  // catch all exception in select() and the following ops in mSelector.
-//                Log.e(TAG, "Exception in selector: " + e.toString());
+                Log.e(TAG, "Exception in selector: " + e.toString());
                 notifyConnectionService(MSG_SELECT_ERROR, null, null);
                 break;
             }
@@ -95,7 +95,7 @@ public class SelectorAsyncTask extends AsyncTask<Void, Void, Void> {
             if (!success) {
                 // An error occurred; unregister the channel.
                 selKey.cancel();
-//                Log.e(TAG, " processSelectionKey : finish connection not success !");
+                Log.e(TAG, " processSelectionKey : finish connection not success !");
             }
 //            Log.d(TAG, "processSelectionKey : this client connect to remote success: ");
             notifyConnectionService(MSG_FINISH_CONNECT, sChannel, null);
@@ -140,7 +140,7 @@ public class SelectorAsyncTask extends AsyncTask<Void, Void, Void> {
             int numBytesRead = sChannel.read(buf);
             if (numBytesRead == -1) {
                 // read -1 means socket channel is broken.
-//                Log.e(TAG, "readData : channel closed due to read -1: ");
+                Log.e(TAG, "readData : channel closed due to read -1: ");
                 notifyConnectionService(MSG_BROKEN_CONN, sChannel, null);
                 // sChannel.close();
             } else {
@@ -153,7 +153,7 @@ public class SelectorAsyncTask extends AsyncTask<Void, Void, Void> {
                 jsonString = new String(bytes);  // convert byte[] back to string.
             }
         } catch (Exception e) {
-//            Log.e(TAG, "readData : exception: " + e.toString());
+            Log.e(TAG, "readData : exception: " + e.toString());
             notifyConnectionService(MSG_BROKEN_CONN, sChannel, null);
         }
 
