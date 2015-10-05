@@ -183,7 +183,6 @@ public class ChatActivity extends Activity {
      */
     public void pushOutMessage(String jsonString) {
         try {
-            Log.d("######", "ChatActivity - pushOutMessage: " + jsonString);
             Message msg = ConnectionService.getInstance().getHandler().obtainMessage();
             msg.what = MSG_PUSHOUT_DATA;
             msg.obj = jsonString;

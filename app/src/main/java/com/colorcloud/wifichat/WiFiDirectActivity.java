@@ -192,7 +192,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
                     @Override
                     public void onSuccess() {
-                        Toast.makeText(WiFiDirectActivity.this, "Discovery Initiated", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(WiFiDirectActivity.this, "Discovery Initiated", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override

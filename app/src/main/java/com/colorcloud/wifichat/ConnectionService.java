@@ -103,7 +103,7 @@ public class ConnectionService extends Service {
      * @param msg
      */
     private void processMessage(android.os.Message msg) {
-        Log.d(TAG, "processMessage: " + msg.what);
+//        Log.d(TAG, "processMessage: " + msg.what);
         switch (msg.what) {
             case MSG_NULL:
                 break;
@@ -123,11 +123,9 @@ public class ConnectionService extends Service {
                 mConnMan.onFinishConnect((SocketChannel) msg.obj);
                 break;
             case MSG_PULLIN_DATA:
-                Log.d("######", "ConnectionService - processMessage - PULLIN_DATA");
                 onPullInData((SocketChannel) msg.obj, msg.getData());
                 break;
             case MSG_PUSHOUT_DATA:
-                Log.d("######", "ConnectionService - processMessage - PUSHOUT_DATA");
                 onPushOutData((String) msg.obj);
                 break;
             case MSG_SELECT_ERROR:
@@ -149,6 +147,7 @@ public class ConnectionService extends Service {
         if (register == 1) {
             mActivity = activity;
         } else {
+            Log.e("######", "ConnectionService - mActivity is null");
             mActivity = null;    // set to null explicitly to avoid mem leak.
         }
     }
@@ -156,14 +155,29 @@ public class ConnectionService extends Service {
     /**
      * service handle data in come from socket channel
      */
-    // TODO: 4/10/15 data comes in here, ack them here
-    private String onPullInData(SocketChannel schannel, Bundle b) {
+    private void onPullInData(SocketChannel schannel, Bundle b) {
         String data = b.getString("DATA");
-        Log.d("######", "ConnectionService - onPullInData: " + data);
-        mConnMan.onDataIn(schannel, data);  // pub to all client if this device is server.
-        showNotification(data);
-        showInActivity(data);
-        return data;
+
+        // if the senderId is myAddr, then it is an ACK, otherwise it's data msg, send ACK
+        MsgRow msgRow = MsgRow.parseMsgRow(data);
+        String sender = msgRow.getSender();
+        String myAddr = ConnectionManager.getMyAddr();
+
+        if (sender.equals(myAddr)) {
+            // the incoming message is an ACK
+            SendingMessageQueue.getInstance().acknowledge(msgRow);
+            SendingMessageQueue.getInstance().printMessageQueue();
+        } else {
+            // the incoming message is data msg
+            String time = msgRow.getTime();
+            MsgRow ack = new MsgRow(sender, null, time);
+            onPushOutData(ack.toString());
+            Log.d("######", "ConnectionService - onPullInData, ACK sent");
+
+            mConnMan.onDataIn(schannel, data);  // pub to all client if this device is server.
+            showNotification(data);
+            showInActivity(data);
+        }
     }
 
     /**
@@ -172,7 +186,18 @@ public class ConnectionService extends Service {
      * If the sender is client, only can send to the server.
      */
     private void onPushOutData(String data) {
-        Log.d("######", "ConnectionService - onPushOutData: " + data);
+        // enqueue the sending msg here, the sending msg will be acknowledged
+        // TODO: in future, as more clients come in, the logics need to be changed, so far is for 1-to-1 only
+        MsgRow msgRow = MsgRow.parseMsgRow(data);
+        String sender = msgRow.getSender();
+        // we use senderId to differentiate a data msg from an ACK
+        // if senderId != MyAddr, then it's an ACK
+        String myAddr = ConnectionManager.getMyAddr();
+        if (sender.equals(myAddr)) {
+            SendingMessageQueue.getInstance().addToSendingMessageQueue(msgRow);
+            SendingMessageQueue.getInstance().printMessageQueue();
+        }
+
         mConnMan.pushOutData(data);
     }
 
