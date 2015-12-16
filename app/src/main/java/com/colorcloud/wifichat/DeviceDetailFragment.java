@@ -35,6 +35,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.colorcloud.wifichat.DeviceListFragment.DeviceActionListener;
 
@@ -81,6 +82,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 
             @Override
             public void onClick(View v) {
+
                 WifiP2pConfig config = new WifiP2pConfig();
                 config.deviceAddress = device.deviceAddress;
                 config.wps.setup = WpsInfo.PBC;
@@ -99,7 +101,9 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
                 );
                 // perform p2p connect upon user click the connect button, connect available handle when connection done.
                 ((DeviceActionListener) getActivity()).connect(config);
-
+                Toast.makeText(getActivity(),"DetailFrag Connected", Toast.LENGTH_LONG).show();
+                WiFiDirectActivity.clientdevice = device;
+                Log.d("Connected Device List", device.deviceAddress);
             }
         });
 
@@ -109,6 +113,12 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
                     @Override
                     public void onClick(View v) {
                         ((DeviceActionListener) getActivity()).disconnect();
+
+                        // Force reconnect when dc
+//                        WifiP2pConfig config = new WifiP2pConfig();
+//                        config.deviceAddress = "02:9a:02:57:37:8d";
+//                        config.wps.setup = WpsInfo.PBC;
+//                        ((DeviceActionListener) getActivity()).connect(config);
                     }
                 });
 

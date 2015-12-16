@@ -99,23 +99,26 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 	            if (manager == null) {
 	                return;
 	            }
-	
+
 	            NetworkInfo networkInfo = (NetworkInfo) intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
 	
 	            if (networkInfo.isConnected()) {
 	                // Connected with the other device, request connection info for group owner IP. Callback inside details fragment.
 	                DeviceDetailFragment fragment = (DeviceDetailFragment) activity.getFragmentManager().findFragmentById(R.id.frag_detail);
-	                manager.requestConnectionInfo(channel, fragment);  
+	                manager.requestConnectionInfo(channel, fragment);
+					Toast.makeText(context, "BroadcastReceiver: Connected",  Toast.LENGTH_SHORT).show();
+
+
 	            } else {
 	                // It's a disconnect
-	        		Toast.makeText(context, "Status: Disconnected",  Toast.LENGTH_SHORT).show(); 
-	        		
+	        		Toast.makeText(context, "Status: Disconnected",  Toast.LENGTH_SHORT).show();
+					Toast.makeText(context, "BroadcastReceiver: Disconnected",  Toast.LENGTH_SHORT).show();
 	                activity.resetData();
 	                if (manager != null) {
 		                manager.requestPeers(channel, (PeerListListener) activity.getFragmentManager()
 		                        .findFragmentById(R.id.frag_list));
 
-		            	Log.d(TAG,"Partner ID 2: " + WiFiDirectActivity.partnerDevice);
+		            	Log.d(TAG,"Partner ID 2: " + WiFiDirectActivity.ConnectedPeers.get(0).deviceAddress);
 		                if(WiFiDirectActivity.partnerDevice != null){
 		                	Log.d(TAG,"Check WiFi");
 		                	WifiManager wifi = (WifiManager) activity.getSystemService(Context.WIFI_SERVICE);
@@ -125,26 +128,27 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 			                //while(!networkInfo.isConnected()){
 			                	try{
 				                    manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
-	
-				                        @Override
-				                        public void onSuccess() {
-				                            //Toast.makeText(activity, "Discovery Initiated", Toast.LENGTH_SHORT).show();
 
-						                	Log.d(TAG,"Peer Discovery Success");
-				                        }
-	
-				                        @Override
-				                        public void onFailure(int reasonCode) {
-				                            //Toast.makeText(activity, "Discovery Failed : " + reasonCode, Toast.LENGTH_SHORT).show();
-						                	Log.d(TAG,"Peer Discovery Failed");
-				                        }
-				                    });
+                                        @Override
+                                        public void onSuccess() {
+                                            //Toast.makeText(activity, "Discovery Initiated", Toast.LENGTH_SHORT).show();
+
+                                            Log.d(TAG, "Peer Discovery Success");
+                                        }
+
+                                        @Override
+                                        public void onFailure(int reasonCode) {
+                                            //Toast.makeText(activity, "Discovery Failed : " + reasonCode, Toast.LENGTH_SHORT).show();
+                                            Log.d(TAG, "Peer Discovery Failed");
+                                        }
+                                    });
 				                    manager.requestPeers(channel, (PeerListListener) activity.getFragmentManager()
 					                        .findFragmentById(R.id.frag_list));
 				                    WifiP2pConfig config = new WifiP2pConfig();
-				                    config.deviceAddress = WiFiDirectActivity.partnerDevice;
+									Log.d(TAG,WiFiDirectActivity.ConnectedPeers.get(0).deviceAddress);
+				                    config.deviceAddress = WiFiDirectActivity.ConnectedPeers.get(0).deviceAddress;
 				                    config.wps.setup = WpsInfo.PBC;
-				                	Log.d(TAG,"Before Connecting to partner");
+				                	Log.d(TAG, "Before Connecting to partner");
 				                    activity.connect(config);
 				                	Log.d(TAG,"After Connecting to partner");
 				                    if(networkInfo.isConnectedOrConnecting()){
@@ -153,7 +157,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 				                    }
 			                	}
 			                	catch(Exception e) {
-			                		Log.d(TAG,"2 error: " + e.toString());
+			                		Log.d(TAG,"2 error: here " + e.toString());
 			                		//r++;
 			                		//if(r >= rcap) break;
 					    	        Handler handler = new Handler(); 
@@ -200,7 +204,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 	                        .findFragmentById(R.id.frag_list));
                     
                     WifiP2pConfig config = new WifiP2pConfig();
-                    config.deviceAddress = WiFiDirectActivity.partnerDevice;
+                    config.deviceAddress = WiFiDirectActivity.ConnectedPeers.get(0).deviceAddress;
                     config.wps.setup = WpsInfo.PBC;
                 	Log.d(TAG,"Before Connecting to partner");
                     activity.connect(config);

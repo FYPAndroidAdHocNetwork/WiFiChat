@@ -54,8 +54,9 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
     public static final String TAG = "PTP_Activity";
     public static String partnerDevice;
     public static WifiP2pDevice mydevice;
+    public static WifiP2pDevice clientdevice;
     public static List<WifiP2pDevice> lstPeers = new ArrayList<WifiP2pDevice>();
-
+    public static List<WifiP2pDevice> ConnectedPeers = new ArrayList<WifiP2pDevice>();
     private final IntentFilter intentFilter = new IntentFilter();
     private BroadcastReceiver receiver = null;
     private Intent serviceIntent = null;
@@ -358,7 +359,11 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
         ((WiFiChatApp) getApplication()).mP2pConnected = true;
         Log.d(TAG, "onP2pConnected : p2p connected, socket server and client selector started.");
-        Toast.makeText(WiFiDirectActivity.this, "Connected", Toast.LENGTH_SHORT).show();
+        Toast.makeText(WiFiDirectActivity.this, "WIFIDIRECT Connected", Toast.LENGTH_SHORT).show();
+        Toast.makeText(WiFiDirectActivity.this, "WIFIDIRECT MY DEVICE "+ mydevice.deviceName + " : " + mydevice.deviceAddress, Toast.LENGTH_LONG).show();
+        Toast.makeText(WiFiDirectActivity.this, "WIFIDIRECT PARTNER DEVICE "+ partnerDevice, Toast.LENGTH_LONG).show();
+
+
     }
 
     /**
@@ -371,7 +376,6 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
             stopService(serviceIntent);
             serviceIntent = new Intent(this, ConnectionService.class);
             startService(serviceIntent);  // start the connection service
-
             // only starts chat activity when p2p connected
             if (!((WiFiChatApp) getApplication()).mP2pConnected) {
                 Log.d(TAG, "startChatActivity : p2p connection is missing, do nothng...");

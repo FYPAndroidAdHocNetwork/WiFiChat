@@ -32,6 +32,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +100,8 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
     public void onListItemClick(ListView l, View v, int position, long id) {
         WifiP2pDevice device = (WifiP2pDevice) getListAdapter().getItem(position);
         ((DeviceActionListener) getActivity()).showDetails(device);
+
+
     }
 
     /**
@@ -118,6 +121,7 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
             super(context, textViewResourceId, objects);
             WiFiDirectActivity.lstPeers = objects;
             items = objects;
+
         }
 
         @Override
@@ -150,9 +154,18 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
      * @param device WifiP2pDevice object
      */
     public void updateThisDevice(WifiP2pDevice device) { // callback of this device details changed bcast event.
+
         this.device = device;
         WiFiDirectActivity.mydevice = device;
-        WiFiDirectActivity.partnerDevice = device.deviceAddress.equalsIgnoreCase("8a:c9:d0:ea:de:f2") ? "ee:88:92:7a:ed:c0" : "8a:c9:d0:ea:de:f2";
+        Toast.makeText(getActivity(), " DLF MY DEVICE " + device.deviceName + " : " + device.deviceAddress, Toast.LENGTH_SHORT).show();
+        //WiFiDirectActivity.partnerDevice = "02:ee:bd:9c:09:2f";
+//        if(WiFiDirectActivity.partnerDevice == null && WiFiDirectActivity.ConnectedPeers.isEmpty() && !WiFiDirectBroadcastReceiver.connected){
+//               WiFiDirectActivity.partnerDevice = device.deviceAddress;
+//        }else{
+//            WiFiDirectActivity.partnerDevice = WiFiDirectActivity.ConnectedPeers.get(0).deviceAddress;
+//        }
+
+        //WiFiDirectActivity.partnerDevice = device.deviceAddress.equalsIgnoreCase("8a:c9:d0:ea:de:f2") ? "ee:88:92:7a:ed:c0" : "8a:c9:d0:ea:de:f2";
         TextView view = (TextView) mContentView.findViewById(R.id.my_name);
         view.setText(device.deviceName);
         view = (TextView) mContentView.findViewById(R.id.my_status);
@@ -174,6 +187,13 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         if (peers.size() == 0) {
             Log.d(WiFiDirectActivity.TAG, "No devices found");
             return;
+        }else{
+
+            for (int i = 0; i < WiFiDirectActivity.lstPeers.size() ; i++) {
+                Log.d("Device List", WiFiDirectActivity.lstPeers.get(i).deviceAddress);
+            }
+
+
         }
 
     }

@@ -3,6 +3,8 @@ package com.colorcloud.wifichat;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -130,9 +132,20 @@ public class ConnectionManager {
             ((WiFiChatApp) mService.getApplication()).setMyAddr(mClientAddr);
             Log.d(TAG, "startClientSelector : started: " + mClientSocketChannel.socket().getLocalAddress().getHostAddress());
 
+            //Client's partner list
+            //Check if partner mac address in connected peers list
+            String servermac = getMacFromArpCache(sChannel.socket().getInetAddress().getHostAddress());
+            Log.d(TAG, "Connected to SERVER" + servermac);
+            for (int i = 0; i < WiFiDirectActivity.lstPeers.size(); i++) {
+                if(WiFiDirectActivity.lstPeers.get(i).deviceAddress == servermac ){
+                    WiFiDirectActivity.ConnectedPeers.add(WiFiDirectActivity.lstPeers.get(i));
+                    Log.d(TAG, servermac + " is added");
+                    break;
+                }
+            }
             //Toast.makeText(this.mContext,"startClientSelector : started: " + mClientSocketChannel.socket().getLocalAddress().getHostAddress(),  Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
-            Log.e(TAG, "startClientSelector : exception: ");
+            Log.e(TAG, "startClientSelector : exception: "+ e);
 
             //Toast.makeText(this.mContext,"startClientSelector : exception: ",  Toast.LENGTH_SHORT).show();
             mSelector = null;
@@ -145,6 +158,67 @@ public class ConnectionManager {
         return 0;
     }
 
+    public static String getMacFromArpCache(String ip) {
+        if (ip == null)
+            return null;
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader("/proc/net/arp"));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] splitted = line.split(" +");
+                if (splitted != null && splitted.length >= 4 && ip.equals(splitted[0])) {
+                    // Basic sanity check
+                    String mac = splitted[3];
+                    if (mac.matches("..:..:..:..:..:..")) {
+                        return mac;
+                    } else {
+                        return null;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public static String getIPFromMac(String MAC) {
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader("/proc/net/arp"));
+            String line;
+            while ((line = br.readLine()) != null) {
+
+                String[] splitted = line.split(" +");
+                if (splitted != null && splitted.length >= 4) {
+                    // Basic sanity check
+                    String device = splitted[5];
+                    if (device.matches(".*p2p-p2p0.*")){
+                        String mac = splitted[3];
+                        if (mac.matches(MAC)) {
+                            return splitted[0];
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
     /**
      * create a selector to manage a server socket channel
      * The registration process yields an object called a selection key which identifies the selector/socket channel pair
@@ -157,6 +231,7 @@ public class ConnectionManager {
             ServerSocketChannel sServerChannel = createServerSocketChannel(1080); // BindException if already bind.
             mServerSocketChannel = sServerChannel;
             mServerAddr = mServerSocketChannel.socket().getInetAddress().getHostAddress();
+            Log.d(TAG,"mServerAddr1 "+mServerAddr);
             if ("0.0.0.0".equals(mServerAddr)) {
                 mServerAddr = "Header";
             }
@@ -169,7 +244,10 @@ public class ConnectionManager {
 
             //SocketChannel sChannel = createSocketChannel("hostname.com", 80);
             //sChannel.register(selector, SelectionKey.OP_CONNECT);  // listen to connect event.
+
+           // Log.d(TAG, "Connected to " + WiFiDirectActivity.mydevice.deviceAddress);
             Log.d(TAG, "startServerSelector : started: " + sServerChannel.socket().getLocalSocketAddress().toString());
+
             //Toast.makeText(this.mContext,"startServerSelector : started: " + sServerChannel.socket().getLocalSocketAddress().toString(),  Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Log.e(TAG, "startServerSelector : exception: ");
@@ -234,11 +312,17 @@ public class ConnectionManager {
         if (mIsServer) {
             mClientChannels.remove(peeraddr);
             Log.d(TAG, "onBrokenConn : client down: " + peeraddr);
+            closeClient();
+            closeServer();
+
             //Toast.makeText(this.mContext,"onBrokenConn : client down: " + peeraddr,  Toast.LENGTH_SHORT).show();
         } else {
             Log.d(TAG, "onBrokenConn : set null client channel after server down: " + peeraddr);
             //Toast.makeText(this.mContext,"onBrokenConn : set null client channel after server down: " + peeraddr,  Toast.LENGTH_SHORT).show();
+            closeServer();
+            closeClient();
             mClientSocketChannel = null;
+
         }
     }
 
@@ -250,6 +334,19 @@ public class ConnectionManager {
         Log.d(TAG, "onNewClient : server added remote client: " + ipaddr);
         //Toast.makeText(this.mContext,"onNewClient : server added remote client: " + ipaddr,  Toast.LENGTH_SHORT).show();
         mClientChannels.put(ipaddr, schannel);
+        //Sever's partner list
+        if(!WiFiDirectActivity.ConnectedPeers.contains(WiFiDirectActivity.clientdevice)){
+            WiFiDirectActivity.ConnectedPeers.add(WiFiDirectActivity.clientdevice);
+            Log.d(TAG,WiFiDirectActivity.clientdevice.deviceAddress +" is added");
+        }
+
+        //Log.d(TAG, "Connected to Client 1 " + clientmac);
+//        for (int i = 0; i < WiFiDirectActivity.lstPeers.size()+1; i++) {
+//            if(WiFiDirectActivity.lstPeers.get(i).deviceAddress == clientmac ){
+//                WiFiDirectActivity.ConnectedPeers.add(WiFiDirectActivity.lstPeers.get(i));
+//                Log.d(TAG, clientmac + " is added");
+//            }
+//        }
     }
 
     /**
