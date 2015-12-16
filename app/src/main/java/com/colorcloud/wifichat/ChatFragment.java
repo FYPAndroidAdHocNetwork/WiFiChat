@@ -206,7 +206,7 @@ public class ChatFragment extends ListFragment {
                 msgRow.setTextColor(Color.CYAN);
                 sender.setTextColor(Color.CYAN);
             }
-            time.setTextColor(Color.BLUE);
+            time.setTextColor(Color.WHITE);
 
             Log.d(TAG, "getView : " + item.mSender + " " + item.mMsg + " " + item.mTime);
             return view;
