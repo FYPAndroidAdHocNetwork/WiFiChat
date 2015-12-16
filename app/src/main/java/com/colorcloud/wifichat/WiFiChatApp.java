@@ -48,14 +48,4 @@ public class WiFiChatApp extends Application {
     public void setMyAddr(String addr){
     	mMyAddr = addr;
     }
-    
-	public static class PTPLog {
-		public static void i(String tag, String msg) {
-            Log.i(tag, msg);
-        }
-		public static void d(String tag, String msg) {
-            Log.d(tag, msg);
-        }
-	}
-
 }

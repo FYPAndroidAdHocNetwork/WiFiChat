@@ -36,7 +36,7 @@ public class ChatFragment extends ListFragment {
     private ArrayAdapter<MsgRow> mAdapter = null;
 
     private String mGroupOwnerAddr;
-    private String mMyAddr;
+    private String mMyDeviceName;
 
     /**
      * Static factory to create a fragment object from tab click.
@@ -56,7 +56,7 @@ public class ChatFragment extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {  // this callback invoked after newInstance done.  
         super.onCreate(savedInstanceState);
-        mMyAddr = ((WiFiChatApp) mActivity.getApplication()).mMyAddr;
+        mMyDeviceName = ((WiFiChatApp) mActivity.getApplication()).mHomeActivity.mydevice.deviceName;
 
         setRetainInstance(true);   // Tell the framework to try to keep this fragment around during a configuration change.
     }
@@ -93,9 +93,9 @@ public class ChatFragment extends ListFragment {
                     InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(inputEditText.getWindowToken(), 0);
 
-                    String formatedmsg = appendChatMessage(new MsgRow(mMyAddr, inputMsg, null));
-                    Log.d(TAG, "sendButton clicked: sendOut data : " + formatedmsg);
-                    mActivity.pushOutMessage(formatedmsg);
+                    String formattedMsg = appendChatMessage(new MsgRow(mMyDeviceName, inputMsg, null));
+                    Log.d(TAG, "sendButton clicked: sendOut data : " + formattedMsg);
+                    mActivity.pushOutMessage(formattedMsg);
                 } else
                     Toast.makeText(getActivity(), "Please input text", Toast.LENGTH_SHORT).show();
             }
@@ -119,14 +119,14 @@ public class ChatFragment extends ListFragment {
 
         mAdapter = new ChatMessageAdapter(mActivity, mMessageList);
         String initmsg = getArguments().getString("initMsg");
-        Log.d(TAG, "onCreate chat msg fragment: my_addr: " + mMyAddr + " : " + initmsg);
+        Log.d(TAG, "onCreate chat msg fragment: my_addr: " + mMyDeviceName + " : " + initmsg);
 
         if (initmsg != null) {
             MsgRow row = MsgRow.parseMsgRow(initmsg);
             mMessageList.add(row);
             Log.d(TAG, "onCreate : " + row.mMsg);
         } else if (mMessageList.size() == 0) {
-            mMessageList.add(new MsgRow(mMyAddr, mMyAddr + " logged in", null));
+            mMessageList.add(new MsgRow(mMyDeviceName, mMyDeviceName + " logged in", null));
         }
         setListAdapter(mAdapter);  // list fragment data adapter 
 
@@ -198,7 +198,7 @@ public class ChatFragment extends ListFragment {
             time.setText(item.mTime);
 
             // set the background color
-            if (!item.mSender.equals(mMyAddr)) {
+            if (!item.mSender.equals(mMyDeviceName)) {
                 // view.setBackgroundResource(R.drawable.row_bkgrd);
                 msgRow.setTextColor(Color.GREEN);
                 sender.setTextColor(Color.GREEN);
