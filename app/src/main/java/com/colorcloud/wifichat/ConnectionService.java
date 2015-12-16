@@ -237,7 +237,7 @@ public class ConnectionService extends Service {
     	
     	NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     	Notification notification = new Notification(R.drawable.ic_action_discover, row.mMsg, System.currentTimeMillis());
-    	notification.defaults |= Notification.DEFAULT_VIBRATE;
+//    	notification.defaults |= Notification.DEFAULT_VIBRATE;
     	CharSequence title = row.mSender;
     	CharSequence text = row.mMsg;
 
