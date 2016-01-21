@@ -53,7 +53,7 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // set list adapter with row layout to adapter data
-        this.setListAdapter(new WiFiPeerListAdapter(getActivity(), R.layout.row_devices, peers));
+        this.setListAdapter(new WiFiPeerListAdapter(getActivity(), R.layout.device_row, peers));
     }
 
     @Override
@@ -126,7 +126,7 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
             if (v == null) {
                 LayoutInflater vi = (LayoutInflater) getActivity().getSystemService(
                         Context.LAYOUT_INFLATER_SERVICE);
-                v = vi.inflate(R.layout.row_devices, null);
+                v = vi.inflate(R.layout.device_row, null);
             }
             WifiP2pDevice device = items.get(position);
             if (device != null) {

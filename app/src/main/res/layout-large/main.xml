@@ -15,7 +15,7 @@
             class="com.colorcloud.wifichat.DeviceListFragment"
             android:layout_width="@dimen/tablet_list_width"
             android:layout_height="match_parent">
-            <!-- Preview: layout=@layout/row_devices -->
+            <!-- Preview: layout=@layout/device_row -->
         </fragment>
 
         <fragment
