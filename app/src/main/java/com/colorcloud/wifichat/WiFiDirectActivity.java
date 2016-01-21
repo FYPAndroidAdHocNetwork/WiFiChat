@@ -21,6 +21,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -62,11 +64,12 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
     ConnectionManager mConnMan = null;
 
-    private WifiP2pManager manager;
+    private WifiP2pManager wifiP2pManager;
     private Channel channel;
 
     private boolean isWifiP2pEnabled = false;
     private boolean retryChannel = false;
+    private boolean peerDiscovered = false;
 
     /**
      * @param isWifiP2pEnabled the isWifiP2pEnabled to set
@@ -88,8 +91,8 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
             intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
             intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
-            manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-            channel = manager.initialize(this, getMainLooper(), null);
+            wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+            channel = wifiP2pManager.initialize(this, getMainLooper(), null);
 
             ((WiFiChatApp) getApplication()).mP2pChannel = channel;
             ((WiFiChatApp) getApplication()).mHomeActivity = this;
@@ -97,7 +100,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
             serviceIntent = new Intent(this, ConnectionService.class);
             startService(serviceIntent);  // start the connection service
 
-            Log.d(TAG, "onCreate : home activity created wifip2p manager and channel: " + manager.toString() + " :: " + channel);
+            Log.d(TAG, "onCreate : home activity created wifip2p wifiP2pManager and channel: " + wifiP2pManager.toString() + " :: " + channel);
         } catch (Exception e) {
             Toast.makeText(this, "On Create Failed", Toast.LENGTH_SHORT).show();
         }
@@ -111,14 +114,14 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
         try {
             super.onResume();
 
-            manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-            channel = manager.initialize(this, getMainLooper(), null);
+            wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+            channel = wifiP2pManager.initialize(this, getMainLooper(), null);
             serviceIntent = new Intent(this, ConnectionService.class);
             startService(serviceIntent);  // start the connection service
 
             ((WiFiChatApp) getApplication()).mP2pChannel = channel;
             ((WiFiChatApp) getApplication()).mHomeActivity = this;
-            receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
+            receiver = new WiFiDirectBroadcastReceiver(wifiP2pManager, channel, this);
             registerReceiver(receiver, intentFilter);
 
         } catch (Exception e) {
@@ -166,8 +169,8 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.atn_direct_enable:
-                if (manager != null && channel != null) {
+            case R.id.btn_direct_enable:
+                if (wifiP2pManager != null && channel != null) {
 
                     // Since this is the system wireless settings activity, it's
                     // not going to send us a result. We will be notified by
@@ -175,11 +178,11 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
                     startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
                 } else {
-                    Log.e(TAG, "channel or manager is null");
+                    Log.e(TAG, "channel or wifiP2pManager is null");
                 }
                 return true;
 
-            case R.id.atn_direct_discover:
+            case R.id.btn_direct_discover:
                 if (!isWifiP2pEnabled) {
                     Toast.makeText(WiFiDirectActivity.this, R.string.p2p_off_warning, Toast.LENGTH_SHORT).show();
                     return true;
@@ -188,11 +191,27 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                 final DeviceListFragment fragment = (DeviceListFragment) getFragmentManager().findFragmentById(R.id.frag_list);
                 fragment.onInitiateDiscovery();  // show progressbar when discoverying.
 
-                manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
+                wifiP2pManager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
 
                     @Override
                     public void onSuccess() {
                         Toast.makeText(WiFiDirectActivity.this, "Discovery Initiated", Toast.LENGTH_SHORT).show();
+                        peerDiscovered = true;
+
+// below code can be used when determine the reachability of a specific client
+//                        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+////                        int rssi = wifi.getConnectionInfo().getRssi();
+////                        Toast.makeText(WiFiDirectActivity.this, "rssi: " + rssi, Toast.LENGTH_SHORT).show();
+//
+//                        List<ScanResult> scanResults = wifiManager.getScanResults();
+//
+//                        int numOfResults = scanResults.size();
+//                        Log.d("######", "num of points: " + numOfResults);
+//                        for (int i = 0; i < numOfResults; i++) {
+//                            String ssid = scanResults.get(i).SSID.toString();
+//                            int rssi = scanResults.get(i).level;
+//                            Log.d("######", "ssid: " + ssid + "; rssi: " + rssi);
+//                        }
                     }
 
                     @Override
@@ -201,6 +220,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                     }
                 });
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -216,14 +236,14 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
     @Override
     public void connect(WifiP2pConfig config) {
         try {
-            manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-            channel = manager.initialize(this, getMainLooper(), null);
+            wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+            channel = wifiP2pManager.initialize(this, getMainLooper(), null);
             stopService(serviceIntent);
             serviceIntent = new Intent(this, ConnectionService.class);
             startService(serviceIntent);  // start the connection service
 
-            // perform p2p connect upon users click the connect button. after connection, manager request connection info.
-            manager.connect(channel, config, new ActionListener() {
+            // perform p2p connect upon users click the connect button. after connection, wifiP2pManager request connection info.
+            wifiP2pManager.connect(channel, config, new ActionListener() {
 
                 @Override
                 public void onSuccess() {
@@ -253,15 +273,15 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
     @Override
     public void disconnect() {
         try {
-            manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-            channel = manager.initialize(this, getMainLooper(), null);
+            wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+            channel = wifiP2pManager.initialize(this, getMainLooper(), null);
             stopService(serviceIntent);
             serviceIntent = new Intent(this, ConnectionService.class);
             startService(serviceIntent);  // start the connection service
 
             final DeviceDetailFragment fragment = (DeviceDetailFragment) getFragmentManager().findFragmentById(R.id.frag_detail);
             fragment.resetViews();
-            manager.removeGroup(channel, new ActionListener() {
+            wifiP2pManager.removeGroup(channel, new ActionListener() {
 
                 @Override
                 public void onFailure(int reasonCode) {
@@ -286,18 +306,18 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
     public void onChannelDisconnected() {
         try {
 
-            manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-            channel = manager.initialize(this, getMainLooper(), null);
+            wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+            channel = wifiP2pManager.initialize(this, getMainLooper(), null);
             stopService(serviceIntent);
             serviceIntent = new Intent(this, ConnectionService.class);
             startService(serviceIntent);  // start the connection service
 
             // we will try once more,
-            if (manager != null && !retryChannel) {
+            if (wifiP2pManager != null && !retryChannel) {
                 Toast.makeText(this, "Channel lost. Trying again", Toast.LENGTH_LONG).show();
                 resetData();
                 retryChannel = true;
-                manager.initialize(this, getMainLooper(), this);
+                wifiP2pManager.initialize(this, getMainLooper(), this);
             } else {
                 Toast.makeText(this, "Severe! Channel is probably lost premanently. Try Disable/Re-Enable P2P.", Toast.LENGTH_LONG).show();
             }
@@ -310,8 +330,8 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
     public void cancelDisconnect() {
         try {
 
-            manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-            channel = manager.initialize(this, getMainLooper(), null);
+            wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+            channel = wifiP2pManager.initialize(this, getMainLooper(), null);
             stopService(serviceIntent);
             serviceIntent = new Intent(this, ConnectionService.class);
             startService(serviceIntent);  // start the connection service
@@ -321,12 +341,12 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 	         * already connected. Else, request WifiP2pManager to abort the ongoing
 	         * request
 	         */
-            if (manager != null) {
+            if (wifiP2pManager != null) {
                 final DeviceListFragment fragment = (DeviceListFragment) getFragmentManager().findFragmentById(R.id.frag_list);
                 if (fragment.getDevice() == null || fragment.getDevice().status == WifiP2pDevice.CONNECTED) {
                     disconnect();
                 } else if (fragment.getDevice().status == WifiP2pDevice.AVAILABLE || fragment.getDevice().status == WifiP2pDevice.INVITED) {
-                    manager.cancelConnect(channel, new ActionListener() {
+                    wifiP2pManager.cancelConnect(channel, new ActionListener() {
 
                         @Override
                         public void onSuccess() {
@@ -350,8 +370,8 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
      */
     public void onP2pConnected() {
 
-        manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        channel = manager.initialize(this, getMainLooper(), null);
+        wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        channel = wifiP2pManager.initialize(this, getMainLooper(), null);
         stopService(serviceIntent);
         serviceIntent = new Intent(this, ConnectionService.class);
         startService(serviceIntent);  // start the connection service
@@ -366,8 +386,8 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
      */
     public void startChatActivity(String initMsg) {
         try {
-            manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-            channel = manager.initialize(this, getMainLooper(), null);
+            wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+            channel = wifiP2pManager.initialize(this, getMainLooper(), null);
             stopService(serviceIntent);
             serviceIntent = new Intent(this, ConnectionService.class);
             startService(serviceIntent);  // start the connection service
