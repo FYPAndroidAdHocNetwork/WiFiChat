@@ -69,7 +69,6 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
     private boolean isWifiP2pEnabled = false;
     private boolean retryChannel = false;
-    private boolean peerDiscovered = false;
 
     /**
      * @param isWifiP2pEnabled the isWifiP2pEnabled to set
@@ -196,8 +195,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
                     @Override
                     public void onSuccess() {
-                        Toast.makeText(WiFiDirectActivity.this, "Discovery Initiated", Toast.LENGTH_SHORT).show();
-                        peerDiscovered = true;
+//                        Toast.makeText(WiFiDirectActivity.this, "Discovery Initiated", Toast.LENGTH_SHORT).show();
 
 // below code can be used when determine the reachability of a specific client
 //                        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);

@@ -111,7 +111,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                     manager.requestConnectionInfo(channel, fragment);
                 } else {
                     // It's a disconnect
-                    Toast.makeText(context, "Status: Disconnected", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "Status: Disconnected", Toast.LENGTH_SHORT).show();
 
                     activity.resetData();
                     if (manager != null) {
@@ -132,7 +132,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                                     @Override
                                     public void onSuccess() {
                                         //Toast.makeText(activity, "Discovery Initiated", Toast.LENGTH_SHORT).show();
-
                                         Log.d(TAG, "Peer Discovery Success");
                                     }
 
@@ -195,7 +194,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                         @Override
                         public void onSuccess() {
                             //Toast.makeText(activity, "Discovery Initiated", Toast.LENGTH_SHORT).show();
-
                             Log.d(TAG, "Peer Discovery Success");
                         }
 

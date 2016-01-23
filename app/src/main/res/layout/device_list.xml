@@ -52,7 +52,7 @@
                 android:layout_weight="1"
                 android:ellipsize="marquee"
                 android:singleLine="true" />
-            
+
         </LinearLayout>
 
     </LinearLayout>
