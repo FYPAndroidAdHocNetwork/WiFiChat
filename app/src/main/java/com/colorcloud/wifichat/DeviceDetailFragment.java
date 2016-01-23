@@ -156,8 +156,8 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         // User has picked an image. Transfer it to group owner i.e peer using
         // FileTransferService.
         Uri uri = data.getData();
-        TextView statusText = (TextView) mContentView.findViewById(R.id.status_text);
-        statusText.setText("Sending: " + uri);
+//        TextView statusText = (TextView) mContentView.findViewById(R.id.status_text);
+//        statusText.setText("Sending: " + uri);
         Log.d(WiFiDirectActivity.TAG, "Intent----------- " + uri);
         Intent serviceIntent = new Intent(getActivity(), FileTransferService.class);
         serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
@@ -181,7 +181,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         // The owner IP is now known.
         TextView view = (TextView) mContentView.findViewById(R.id.group_owner);
         view.setText(getResources().getString(R.string.group_owner_text)
-                + ((info.isGroupOwner == true) ? getResources().getString(R.string.yes)
+                + " " + ((info.isGroupOwner == true) ? getResources().getString(R.string.yes)
                 : getResources().getString(R.string.no)));
 
         // InetAddress from WifiP2pInfo struct.
@@ -201,7 +201,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
             ((WiFiChatApp) getActivity().getApplication()).startSocketClient(info.groupOwnerAddress.getHostAddress());
             // The other device acts as the client. In this case, we enable the get file button.
             //mContentView.findViewById(R.id.btn_start_client).setVisibility(View.VISIBLE);
-            ((TextView) mContentView.findViewById(R.id.status_text)).setText(getResources().getString(R.string.client_text));
+//            ((TextView) mContentView.findViewById(R.id.status_text)).setText(getResources().getString(R.string.client_text));
         }
 
         // hide the connect button
@@ -240,7 +240,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         view.setText(R.string.empty);
         view = (TextView) mContentView.findViewById(R.id.group_owner);
         view.setText(R.string.empty);
-        view = (TextView) mContentView.findViewById(R.id.status_text);
+//        view = (TextView) mContentView.findViewById(R.id.status_text);
         view.setText(R.string.empty);
         mContentView.findViewById(R.id.btn_start_client).setVisibility(View.GONE);
         this.getView().setVisibility(View.GONE);

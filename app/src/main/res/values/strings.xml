@@ -8,8 +8,8 @@
     <string name="disconnect_peer_button">Disconnect</string>
     <string name="start_chat_button">Start Chatting</string>
     <string name="empty"></string>
-    <string name="yes">yes</string>
-    <string name="no">no</string>
+    <string name="yes">YES</string>
+    <string name="no">NO</string>
     <string name="client_text">This device is a client. Click \'Start Chatting\' button</string>
     <string name="empty_message">No devices found. Turn on P2P and perform discovery from the Action Bar</string>
     <string name="p2p_off_warning">Enable P2P from action bar button above or system settings</string>
