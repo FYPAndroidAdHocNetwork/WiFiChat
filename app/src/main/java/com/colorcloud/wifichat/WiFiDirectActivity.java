@@ -169,18 +169,19 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.btn_direct_enable:
-                if (wifiP2pManager != null && channel != null) {
-
-                    // Since this is the system wireless settings activity, it's
-                    // not going to send us a result. We will be notified by
-                    // WiFiDeviceBroadcastReceiver instead.
-
-                    startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
-                } else {
-                    Log.e(TAG, "channel or wifiP2pManager is null");
-                }
-                return true;
+            // P2P on/off option is commented for the time being
+//            case R.id.btn_direct_enable:
+//                if (wifiP2pManager != null && channel != null) {
+//
+//                    // Since this is the system wireless settings activity, it's
+//                    // not going to send us a result. We will be notified by
+//                    // WiFiDeviceBroadcastReceiver instead.
+//
+//                    startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
+//                } else {
+//                    Log.e(TAG, "channel or wifiP2pManager is null");
+//                }
+//                return true;
 
             case R.id.btn_direct_discover:
                 if (!isWifiP2pEnabled) {
@@ -223,6 +224,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
             case R.id.btn_reset_persistent_group:
                 PersistentGroupPeers.getInstance().reset();
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);
