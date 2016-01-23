@@ -221,6 +221,9 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                 });
                 return true;
 
+            case R.id.btn_reset_persistent_group:
+                PersistentGroupPeers.getInstance().reset();
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -234,7 +237,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
     }
 
     @Override
-    public void connect(WifiP2pConfig config) {
+    public void connect(final WifiP2pConfig config) {
         try {
             wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
             channel = wifiP2pManager.initialize(this, getMainLooper(), null);
@@ -248,6 +251,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                 @Override
                 public void onSuccess() {
                     WiFiDirectBroadcastReceiver.connected = true;
+                    PersistentGroupPeers.getInstance().add(config);
                 }
 
                 @Override

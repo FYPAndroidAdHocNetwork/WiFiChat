@@ -182,7 +182,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             }
         } catch (Exception e) {
             Log.d(TAG, "Error: " + e.toString());
-            Toast.makeText(context, "Disconnected", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Disconnected", Toast.LENGTH_SHORT).show();
             NetworkInfo networkInfo = (NetworkInfo) intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
             Log.d(TAG, "Partner ID 1: " + WiFiDirectActivity.partnerDevice);
             if (WiFiDirectActivity.partnerDevice != null) {

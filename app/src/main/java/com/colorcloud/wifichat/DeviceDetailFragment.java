@@ -205,6 +205,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         }
 
         // hide the connect button
+        // todo: UI update
         mContentView.findViewById(R.id.btn_connect).setVisibility(View.GONE);
         mContentView.findViewById(R.id.btn_start_client).setVisibility(View.VISIBLE);  // enable start chat button
 

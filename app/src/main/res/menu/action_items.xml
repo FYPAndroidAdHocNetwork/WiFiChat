@@ -12,4 +12,10 @@
         android:showAsAction="ifRoom|withText"
         android:title="@string/discover_peers_button" />
 
+    <item
+        android:id="@+id/btn_reset_persistent_group"
+        android:icon="@drawable/ic_action_discover"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/reset_persistent_group_button" />
+
 </menu>
