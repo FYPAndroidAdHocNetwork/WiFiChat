@@ -158,7 +158,9 @@ public class ConnectionService extends Service {
     	String data = b.getString("DATA");
     	Log.d(TAG, "onDataIn : recvd msg : " + data);
     	mConnMan.onDataIn(schannel, data);  // pub to all client if this device is server.
-    	showNotification(data);
+
+        // uncomment below line will enable the App to issue push notification upon receiving messages
+//    	showNotification(data);
     	showInActivity(data);
     	return data;
     }
