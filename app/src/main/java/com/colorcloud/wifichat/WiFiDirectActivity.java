@@ -222,6 +222,16 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
             case R.id.btn_reset_persistent_group:
                 PersistentGroupPeers.getInstance().reset();
+                Toast.makeText(WiFiDirectActivity.this, "Persistent groups reset", Toast.LENGTH_SHORT).show();
+                return true;
+
+            case R.id.btn_msg:
+                if (PersistentGroupPeers.getInstance().isEmpty()) {
+                    Toast.makeText(WiFiDirectActivity.this, "This device does not belong to any group yet", Toast.LENGTH_SHORT).show();
+                } else {
+                    // TODO: 23/1/16 logics here
+                }
+
                 return true;
 
             default:
