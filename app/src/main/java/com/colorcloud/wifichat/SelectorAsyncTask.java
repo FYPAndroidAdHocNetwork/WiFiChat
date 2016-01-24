@@ -27,7 +27,7 @@ import static com.colorcloud.wifichat.Constant.MSG_SELECT_ERROR;
  */
 
 public class SelectorAsyncTask extends AsyncTask<Void, Void, Void> {
-//    private static final String TAG = "PTP_SEL";
+    private static final String TAG = "PTP_SEL";
 
     private ConnectionService mConnService;
     private Selector mSelector;
@@ -47,27 +47,27 @@ public class SelectorAsyncTask extends AsyncTask<Void, Void, Void> {
         // Wait for events looper
         while (true) {
             try {
-//                Log.d(TAG, "select : selector monitoring: ");
+                Log.d(TAG, "select : selector monitoring: ");
                 mSelector.select();   // blocked on waiting for event
 
-//                Log.d(TAG, "select : selector evented out: ");
+                Log.d(TAG, "select : selector evented out: ");
                 // Get list of selection keys with pending events, and process it.
                 Iterator<SelectionKey> keys = mSelector.selectedKeys().iterator();
                 while (keys.hasNext()) {
                     // Get the selection key, and remove it from the list to indicate that it's being processed
                     SelectionKey selKey = keys.next();
                     keys.remove();
-//                    Log.d(TAG, "select : selectionkey: " + selKey.attachment());
+                    Log.d(TAG, "select : selectionkey: " + selKey.attachment());
 
                     try {
                         processSelectionKey(mSelector, selKey);  // process the selection key.
                     } catch (IOException e) {
                         selKey.cancel();
-//                        Log.e(TAG, "select : io exception in processing selector event: " + e.toString());
+                        Log.e(TAG, "select : io exception in processing selector event: " + e.toString());
                     }
                 }
             } catch (Exception e) {  // catch all exception in select() and the following ops in mSelector.
-//                Log.e(TAG, "Exception in selector: " + e.toString());
+                Log.e(TAG, "Exception in selector: " + e.toString());
                 notifyConnectionService(MSG_SELECT_ERROR, null, null);
                 break;
             }
@@ -86,7 +86,7 @@ public class SelectorAsyncTask extends AsyncTask<Void, Void, Void> {
             // let the selector monitor read/write the accepted connections.
             SelectionKey socketKey = sChannel.register(selector, SelectionKey.OP_READ);
             socketKey.attach("accepted_client " + sChannel.socket().getInetAddress().getHostAddress());
-//            Log.d(TAG, "processSelectionKey : accepted a client connection: " + sChannel.socket().getInetAddress().getHostAddress());
+            Log.d(TAG, "processSelectionKey : accepted a client connection: " + sChannel.socket().getInetAddress().getHostAddress());
             notifyConnectionService(MSG_NEW_CLIENT, sChannel, null);
         } else if (selKey.isValid() && selKey.isConnectable()) {   // client connect to server got the response.
             SocketChannel sChannel = (SocketChannel) selKey.channel();
@@ -95,15 +95,15 @@ public class SelectorAsyncTask extends AsyncTask<Void, Void, Void> {
             if (!success) {
                 // An error occurred; unregister the channel.
                 selKey.cancel();
-//                Log.e(TAG, " processSelectionKey : finish connection not success !");
+                Log.e(TAG, " processSelectionKey : finish connection not success !");
             }
-//            Log.d(TAG, "processSelectionKey : this client connect to remote success: ");
+            Log.d(TAG, "processSelectionKey : this client connect to remote success: ");
             notifyConnectionService(MSG_FINISH_CONNECT, sChannel, null);
             //mOutChannels.put(Integer.toString(sChannel.socket().getLocalPort()), sChannel);
         } else if (selKey.isValid() && selKey.isReadable()) {
             // Get channel with bytes to read
             SocketChannel sChannel = (SocketChannel) selKey.channel();
-//            Log.d(TAG, "processSelectionKey : remote client is readable, read data: " + selKey.attachment());
+            Log.d(TAG, "processSelectionKey : remote client is readable, read data: " + selKey.attachment());
             // we can retrieve the key we attached earlier, so we now what to do / where the data is coming from
             // MyIdentifierType myIdentifier = (MyIdentifierType)key.attachment();
             // myIdentifier.readTheData();
@@ -111,7 +111,7 @@ public class SelectorAsyncTask extends AsyncTask<Void, Void, Void> {
         } else if (selKey.isValid() && selKey.isWritable()) {
             // Not select on writable...endless loop.
             SocketChannel sChannel = (SocketChannel) selKey.channel();
-//            Log.d(TAG, "processSelectionKey : remote client is writable, write data: ");
+            Log.d(TAG, "processSelectionKey : remote client is writable, write data: ");
         }
     }
 
@@ -140,24 +140,24 @@ public class SelectorAsyncTask extends AsyncTask<Void, Void, Void> {
             int numBytesRead = sChannel.read(buf);
             if (numBytesRead == -1) {
                 // read -1 means socket channel is broken.
-//                Log.e(TAG, "readData : channel closed due to read -1: ");
+                Log.e(TAG, "readData : channel closed due to read -1: ");
                 notifyConnectionService(MSG_BROKEN_CONN, sChannel, null);
                 // sChannel.close();
             } else {
-//                Log.d(TAG, "readData: bufpos: limit : " + buf.position() + ":" + buf.limit() + " : " + buf.capacity());
+                Log.d(TAG, "readData: bufpos: limit : " + buf.position() + ":" + buf.limit() + " : " + buf.capacity());
                 buf.flip();  // make buffer ready for read by flipping it into read mode.
-//                Log.d(TAG, "readData: bufpos: limit : " + buf.position() + ":" + buf.limit() + " : " + buf.capacity());
+                Log.d(TAG, "readData: bufpos: limit : " + buf.position() + ":" + buf.limit() + " : " + buf.capacity());
                 bytes = new byte[buf.limit()];  // use bytes.length will cause underflow exception.
                 buf.get(bytes);
                 // while ( buf.hasRemaining() ) buf.get();
                 jsonString = new String(bytes);  // convert byte[] back to string.
             }
         } catch (Exception e) {
-//            Log.e(TAG, "readData : exception: " + e.toString());
+            Log.e(TAG, "readData : exception: " + e.toString());
             notifyConnectionService(MSG_BROKEN_CONN, sChannel, null);
         }
 
-//        Log.d(TAG, "readData: content: " + jsonString);
+        Log.d(TAG, "readData: content: " + jsonString);
         return jsonString;
     }
 
