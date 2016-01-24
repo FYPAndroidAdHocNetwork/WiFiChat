@@ -229,7 +229,8 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                 if (PersistentGroupPeers.getInstance().isEmpty()) {
                     Toast.makeText(WiFiDirectActivity.this, "This device does not belong to any group yet", Toast.LENGTH_SHORT).show();
                 } else {
-                    // TODO: 23/1/16 logics here
+                    // TODO: 23/1/16 UI logics update here to replace the "start chatting" button
+                    this.startChatActivity(null);
                 }
 
                 return true;

@@ -113,18 +113,18 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
                 });
 
         // p2p connected, manager request connection info done, group owner elected. 
-        mContentView.findViewById(R.id.btn_start_client).setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // Allow user to pick an image from Gallery or other registered apps
-                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                        intent.setType("image/*");
-                        //startActivityForResult(intent, CHOOSE_FILE_RESULT_CODE);
-                        Log.d(TAG, "start_client button clicked, start chat activity !");
-                        ((WiFiDirectActivity) getActivity()).startChatActivity(null);  // no init msg if started from button click.
-                    }
-                });
+//        mContentView.findViewById(R.id.btn_start_client).setOnClickListener(
+//                new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        // Allow user to pick an image from Gallery or other registered apps
+//                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//                        intent.setType("image/*");
+//                        //startActivityForResult(intent, CHOOSE_FILE_RESULT_CODE);
+//                        Log.d(TAG, "start_client button clicked, start chat activity !");
+//                        ((WiFiDirectActivity) getActivity()).startChatActivity(null);  // no init msg if started from button click.
+//                    }
+//                });
 
         if (WiFiDirectActivity.partnerDevice != null) {
             if (device.deviceAddress == WiFiDirectActivity.partnerDevice) {
@@ -207,7 +207,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         // hide the connect button
         // todo: UI update
         mContentView.findViewById(R.id.btn_connect).setVisibility(View.GONE);
-        mContentView.findViewById(R.id.btn_start_client).setVisibility(View.VISIBLE);  // enable start chat button
+//        mContentView.findViewById(R.id.btn_start_client).setVisibility(View.VISIBLE);  // enable start chat button
 
         Log.d(TAG, "onConnectionInfoAvailable: socket connection established, show start chat button ! ");
         ((WiFiDirectActivity) getActivity()).onP2pConnected();  // p2p connected, socket server and client selector started.
@@ -242,7 +242,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         view.setText(R.string.empty);
 //        view = (TextView) mContentView.findViewById(R.id.status_text);
         view.setText(R.string.empty);
-        mContentView.findViewById(R.id.btn_start_client).setVisibility(View.GONE);
+//        mContentView.findViewById(R.id.btn_start_client).setVisibility(View.GONE);
         this.getView().setVisibility(View.GONE);
     }
 
