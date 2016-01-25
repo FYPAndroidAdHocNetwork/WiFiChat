@@ -53,7 +53,7 @@ import java.util.List;
  */
 public class WiFiDirectActivity extends Activity implements ChannelListener, DeviceActionListener {
 
-    public static final String TAG = "PTP_Activity";
+//    public static final String TAG = "PTP_Activity";
     public static String partnerDevice;
     public static WifiP2pDevice mydevice;
     public static List<WifiP2pDevice> lstPeers = new ArrayList<WifiP2pDevice>();
@@ -99,7 +99,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
             serviceIntent = new Intent(this, ConnectionService.class);
             startService(serviceIntent);  // start the connection service
 
-            Log.d(TAG, "onCreate : home activity created wifip2p wifiP2pManager and channel: " + wifiP2pManager.toString() + " :: " + channel);
+//            Log.d(TAG, "onCreate : home activity created wifip2p wifiP2pManager and channel: " + wifiP2pManager.toString() + " :: " + channel);
         } catch (Exception e) {
             Toast.makeText(this, "On Create Failed", Toast.LENGTH_SHORT).show();
         }
@@ -274,7 +274,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
-                    Log.d(TAG, "Wait Done");
+//                    Log.d(TAG, "Wait Done");
                 }
             }, 1000);
         } catch (Exception e) {
@@ -300,7 +300,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
                 @Override
                 public void onFailure(int reasonCode) {
-                    Log.d(TAG, "Disconnect failed. Reason : 1=error, 2=busy; " + reasonCode);
+//                    Log.d(TAG, "Disconnect failed. Reason : 1=error, 2=busy; " + reasonCode);
                 }
 
                 @Override
@@ -392,7 +392,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
         startService(serviceIntent);  // start the connection service
 
         ((WiFiChatApp) getApplication()).mP2pConnected = true;
-        Log.d(TAG, "onP2pConnected : p2p connected, socket server and client selector started.");
+//        Log.d(TAG, "onP2pConnected : p2p connected, socket server and client selector started.");
         Toast.makeText(WiFiDirectActivity.this, "Connected", Toast.LENGTH_SHORT).show();
     }
 
@@ -409,11 +409,11 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
             // only starts chat activity when p2p connected
             if (!((WiFiChatApp) getApplication()).mP2pConnected) {
-                Log.d(TAG, "startChatActivity : p2p connection is missing, do nothng...");
+//                Log.d(TAG, "startChatActivity : p2p connection is missing, do nothng...");
                 return;
             }
 
-            Log.d(TAG, "startChatActivity : start chat activity fragment..." + initMsg);
+//            Log.d(TAG, "startChatActivity : start chat activity fragment..." + initMsg);
             Intent i = new Intent(this, ChatActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             i.putExtra("FIRST_MSG", initMsg);

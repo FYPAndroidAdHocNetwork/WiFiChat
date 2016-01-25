@@ -52,7 +52,7 @@ import java.net.Socket;
  */
 public class DeviceDetailFragment extends Fragment implements ConnectionInfoListener {
 
-    private static final String TAG = "PTP_Detail";
+//    private static final String TAG = "PTP_Detail";
 
     protected static final int CHOOSE_FILE_RESULT_CODE = 20;
     private View mContentView = null;
@@ -158,7 +158,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         Uri uri = data.getData();
 //        TextView statusText = (TextView) mContentView.findViewById(R.id.status_text);
 //        statusText.setText("Sending: " + uri);
-        Log.d(WiFiDirectActivity.TAG, "Intent----------- " + uri);
+//        Log.d(WiFiDirectActivity.TAG, "Intent----------- " + uri);
         Intent serviceIntent = new Intent(getActivity(), FileTransferService.class);
         serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
         serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, uri.toString());
@@ -191,13 +191,13 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         // After the group negotiation, we assign the group owner as the file
         // server. The file server is single threaded, single connection server
         // socket.
-        Log.d(TAG, "onConnectionInfoAvailable: " + info.groupOwnerAddress.getHostAddress());
+//        Log.d(TAG, "onConnectionInfoAvailable: " + info.groupOwnerAddress.getHostAddress());
         if (info.groupFormed && info.isGroupOwner) {
             //new FileServerAsyncTask(getActivity(), mContentView.findViewById(R.id.status_text)).execute();
-            Log.d(TAG, "onConnectionInfoAvailable: device is groupOwner: startSocketServer ");
+//            Log.d(TAG, "onConnectionInfoAvailable: device is groupOwner: startSocketServer ");
             ((WiFiChatApp) getActivity().getApplication()).startSocketServer();
         } else if (info.groupFormed) {
-            Log.d(TAG, "onConnectionInfoAvailable: device is client, connect to group owner: startSocketClient ");
+//            Log.d(TAG, "onConnectionInfoAvailable: device is client, connect to group owner: startSocketClient ");
             ((WiFiChatApp) getActivity().getApplication()).startSocketClient(info.groupOwnerAddress.getHostAddress());
             // The other device acts as the client. In this case, we enable the get file button.
             //mContentView.findViewById(R.id.btn_start_client).setVisibility(View.VISIBLE);
@@ -209,7 +209,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         mContentView.findViewById(R.id.btn_connect).setVisibility(View.GONE);
 //        mContentView.findViewById(R.id.btn_start_client).setVisibility(View.VISIBLE);  // enable start chat button
 
-        Log.d(TAG, "onConnectionInfoAvailable: socket connection established, show start chat button ! ");
+//        Log.d(TAG, "onConnectionInfoAvailable: socket connection established, show start chat button ! ");
         ((WiFiDirectActivity) getActivity()).onP2pConnected();  // p2p connected, socket server and client selector started.
     }
 
@@ -268,10 +268,10 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         protected String doInBackground(Void... params) {
             try {
                 ServerSocket serverSocket = new ServerSocket(8988);
-                Log.d(WiFiDirectActivity.TAG, "Server: Socket opened");
+//                Log.d(WiFiDirectActivity.TAG, "Server: Socket opened");
 
                 Socket client = serverSocket.accept();
-                Log.d(WiFiDirectActivity.TAG, "Server: connection done");
+//                Log.d(WiFiDirectActivity.TAG, "Server: connection done");
 
 
                 final File f = new File(Environment.getExternalStorageDirectory() + "/"
@@ -283,13 +283,13 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
                     dirs.mkdirs();
                 f.createNewFile();
 
-                Log.d(WiFiDirectActivity.TAG, "server: copying files " + f.toString());
+//                Log.d(WiFiDirectActivity.TAG, "server: copying files " + f.toString());
                 InputStream inputstream = client.getInputStream();
                 copyFile(inputstream, new FileOutputStream(f));
                 serverSocket.close();
                 return f.getAbsolutePath();
             } catch (IOException e) {
-                Log.e(WiFiDirectActivity.TAG, e.getMessage());
+                Log.e("DeviceDetailFragment", e.getMessage());
                 return null;
             }
         }
@@ -332,7 +332,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
             out.close();
             inputStream.close();
         } catch (IOException e) {
-            Log.d(WiFiDirectActivity.TAG, e.toString());
+            Log.e("DeviceDetailFragment", e.toString());
             return false;
         }
         return true;

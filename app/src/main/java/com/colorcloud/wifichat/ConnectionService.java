@@ -31,7 +31,7 @@ import android.util.Log;
 
 public class ConnectionService extends Service {
 	
-	private static final String TAG = "PTP_Serv";
+//	private static final String TAG = "PTP_Serv";
 	
 	private static ConnectionService _sinstance = null;
 
@@ -52,12 +52,12 @@ public class ConnectionService extends Service {
     
     private void _initialize() {
     	if (_sinstance != null) {
-            Log.d(TAG, "_initialize, already initialized, do nothing.");
+//            Log.d(TAG, "_initialize, already initialized, do nothing.");
             return;
         }
 
     	_sinstance = this;
-    	mWorkHandler = new WorkHandler(TAG);
+    	mWorkHandler = new WorkHandler("ConnectionService");
         mHandler = new MessageHandler(mWorkHandler.getLooper());
         
         mConnMan = new ConnectionManager(this);
@@ -103,7 +103,7 @@ public class ConnectionService extends Service {
      * @param msg
      */
     private void processMessage(android.os.Message msg) {
-    	Log.d(TAG, "processMessage: " + msg.what);
+//    	Log.d(TAG, "processMessage: " + msg.what);
         switch (msg.what) {
         case MSG_NULL:
         	break;
@@ -143,7 +143,7 @@ public class ConnectionService extends Service {
      * register the activity that uses this service.
      */
     private void onActivityRegister(ChatActivity activity, int register){
-    	Log.d(TAG, "onActivityRegister : activity register itself to service : " + register);
+//    	Log.d(TAG, "onActivityRegister : activity register itself to service : " + register);
     	if( register == 1){
     		mActivity = activity;
     	}else{
@@ -156,7 +156,7 @@ public class ConnectionService extends Service {
      */
     private String onPullInData(SocketChannel schannel, Bundle b){
     	String data = b.getString("DATA");
-    	Log.d(TAG, "onDataIn : recvd msg : " + data);
+//    	Log.d(TAG, "onDataIn : recvd msg : " + data);
     	mConnMan.onDataIn(schannel, data);  // pub to all client if this device is server.
 
         // uncomment below line will enable the App to issue push notification upon receiving messages
@@ -171,7 +171,7 @@ public class ConnectionService extends Service {
      * If the sender is client, only can send to the server.
      */
     private void onPushOutData(String data){
-    	Log.d(TAG, "onPushOutData : " + data);
+//    	Log.d(TAG, "onPushOutData : " + data);
     	mConnMan.pushOutData(data);
     }
     
@@ -179,7 +179,7 @@ public class ConnectionService extends Service {
      * sync call to send data using conn man's channel, as conn man now is blocking on select
      */
     public int connectionSendData(String jsonstring) {
-    	Log.d(TAG, "connectionSendData : " + jsonstring);
+//    	Log.d(TAG, "connectionSendData : " + jsonstring);
     	new SendDataAsyncTask(mConnMan, jsonstring).execute();
     	return 0;
     	//return mConnMan.clientSendData(jsonstring);
@@ -204,7 +204,7 @@ public class ConnectionService extends Service {
 		 
 		@Override
 		protected void onPostExecute(Integer result) {
-			Log.d(TAG, "SendDataAsyncTask : onPostExecute:  " + data + " len: " + result);
+//			Log.d(TAG, "SendDataAsyncTask : onPostExecute:  " + data + " len: " + result);
 		}
     }
     
@@ -212,7 +212,7 @@ public class ConnectionService extends Service {
      * show the message in activity
      */
     private void showInActivity(final String msg){
-    	Log.d(TAG, "showInActivity : " + msg);
+//    	Log.d(TAG, "showInActivity : " + msg);
     	if( mActivity != null ){
     		mActivity.runOnUiThread(new Runnable() {
     			@Override public void run() {
@@ -220,7 +220,7 @@ public class ConnectionService extends Service {
     			}
     		});
     	} else {
-    		Log.d(TAG, "showInActivity :  chat activity down, force start !");
+//    		Log.d(TAG, "showInActivity :  chat activity down, force start !");
     		if( ((WiFiChatApp)getApplication()).mHomeActivity != null ){
     			((WiFiChatApp)getApplication()).mHomeActivity.runOnUiThread(new Runnable() {
     				@Override public void run() {

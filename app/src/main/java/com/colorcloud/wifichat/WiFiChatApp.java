@@ -11,7 +11,7 @@ import android.util.Log;
 
 public class WiFiChatApp extends Application {
 
-	private static final String TAG = "PTP_APP";
+//	private static final String TAG = "PTP_APP";
 	
 	Channel mP2pChannel;
 	WiFiDirectActivity mHomeActivity = null;
@@ -37,7 +37,7 @@ public class WiFiChatApp extends Application {
      * upon p2p connection available, non group owner start socket channel connect to group owner.
      */
     public void startSocketClient(String hostname) {
-    	Log.d(TAG, "startSocketClient : client connect to group owner : " + hostname);
+//    	Log.d(TAG, "startSocketClient : client connect to group owner : " + hostname);
     	Message msg = ConnectionService.getInstance().getHandler().obtainMessage();
     	msg.what = MSG_STARTCLIENT;
     	msg.obj = hostname;

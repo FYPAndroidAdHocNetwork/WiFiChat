@@ -28,7 +28,7 @@ import java.util.StringTokenizer;
  * chat fragment attached to main activity.
  */
 public class ChatFragment extends ListFragment {
-    private static final String TAG = "PTP_ChatFrag";
+//    private static final String TAG = "PTP_ChatFrag";
 
     private static ChatActivity mActivity = null;
 
@@ -49,7 +49,7 @@ public class ChatFragment extends ListFragment {
         args.putString("groupOwnerAddr", groupOwnerAddr);
         args.putString("initMsg", msg);
         f.setArguments(args);
-        Log.d(TAG, "newInstance :" + groupOwnerAddr + " : " + msg);
+//        Log.d(TAG, "newInstance :" + groupOwnerAddr + " : " + msg);
         return f;
     }
 
@@ -70,7 +70,7 @@ public class ChatFragment extends ListFragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList("MSG_LIST", mMessageList);
-        Log.d(TAG, "onSaveInstanceState. " + mMessageList.get(0).mMsg);
+//        Log.d(TAG, "onSaveInstanceState. " + mMessageList.get(0).mMsg);
     }
 
     /**
@@ -94,7 +94,7 @@ public class ChatFragment extends ListFragment {
                     imm.hideSoftInputFromWindow(inputEditText.getWindowToken(), 0);
 
                     String formattedMsg = appendChatMessage(new MsgRow(mMyDeviceName, inputMsg, null));
-                    Log.d(TAG, "sendButton clicked: sendOut data : " + formattedMsg);
+//                    Log.d(TAG, "sendButton clicked: sendOut data : " + formattedMsg);
                     mActivity.pushOutMessage(formattedMsg);
                 } else
                     Toast.makeText(getActivity(), "Please input text", Toast.LENGTH_SHORT).show();
@@ -104,27 +104,27 @@ public class ChatFragment extends ListFragment {
         String groupOwnerAddr = getArguments().getString("groupOwnerAddr");
         mGroupOwnerAddr = groupOwnerAddr;
         String msg = getArguments().getString("initMsg");
-        Log.d(TAG, "onCreateView : fragment view created: msg :" + msg);
+//        Log.d(TAG, "onCreateView : fragment view created: msg :" + msg);
 
         if (savedInstanceState != null) {
             mMessageList = savedInstanceState.getParcelableArrayList("MSG_LIST");
-            Log.d(TAG, "onCreate : savedInstanceState: " + mMessageList.get(0).mMsg);
+//            Log.d(TAG, "onCreate : savedInstanceState: " + mMessageList.get(0).mMsg);
         } else if (mMessageList == null) {
             // no need to setContentView, just setListAdapter, but listview must be android:id="@android:id/list"
             mMessageList = new ArrayList<MsgRow>(200);
-            Log.d(TAG, "onCreate : empty start : ");
+//            Log.d(TAG, "onCreate : empty start : ");
         } else {
-            Log.d(TAG, "onCreate : setRetainInstance good : ");
+//            Log.d(TAG, "onCreate : setRetainInstance good : ");
         }
 
         mAdapter = new ChatMessageAdapter(mActivity, mMessageList);
         String initmsg = getArguments().getString("initMsg");
-        Log.d(TAG, "onCreate chat msg fragment: my_addr: " + mMyDeviceName + " : " + initmsg);
+//        Log.d(TAG, "onCreate chat msg fragment: my_addr: " + mMyDeviceName + " : " + initmsg);
 
         if (initmsg != null) {
             MsgRow row = MsgRow.parseMsgRow(initmsg);
             mMessageList.add(row);
-            Log.d(TAG, "onCreate : " + row.mMsg);
+//            Log.d(TAG, "onCreate : " + row.mMsg);
         } else if (mMessageList.size() == 0) {
             mMessageList.add(new MsgRow(mMyDeviceName, mMyDeviceName + " logged in", null));
         }
@@ -136,7 +136,7 @@ public class ChatFragment extends ListFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Log.d(TAG, "onDestroyView: ");
+//        Log.d(TAG, "onDestroyView: ");
     }
 
     @Override
@@ -144,14 +144,14 @@ public class ChatFragment extends ListFragment {
         super.onActivityCreated(savedInstanceState);
 
         setHasOptionsMenu(true);
-        Log.d(TAG, "onActivityCreated: chat fragment displayed ");
+//        Log.d(TAG, "onActivityCreated: chat fragment displayed ");
     }
 
     /**
      * add a chat message to the list, return the format the message as " sender_addr : msg "
      */
     public String appendChatMessage(MsgRow msg) {
-        Log.d(TAG, "appendChatMessage: chat fragment append msg: " + msg);
+//        Log.d(TAG, "appendChatMessage: chat fragment append msg: " + msg);
         mMessageList.add(msg);
         // mAdapter.add(msg);
         mAdapter.notifyDataSetChanged();  // notify the attached observer and views to refresh.
@@ -208,7 +208,7 @@ public class ChatFragment extends ListFragment {
             }
             time.setTextColor(Color.WHITE);
 
-            Log.d(TAG, "getView : " + item.mSender + " " + item.mMsg + " " + item.mTime);
+//            Log.d(TAG, "getView : " + item.mSender + " " + item.mMsg + " " + item.mTime);
             return view;
         }
     }
@@ -265,7 +265,7 @@ public class ChatFragment extends ListFragment {
                     break;  // done
                 }
             }
-            Log.d(TAG, "parseMsgRow : " + row.mMsg);
+//            Log.d(TAG, "parseMsgRow : " + row.mMsg);
             return row;
         }
 

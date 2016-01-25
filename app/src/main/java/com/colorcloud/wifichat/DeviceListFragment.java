@@ -42,7 +42,7 @@ import java.util.List;
  */
 public class DeviceListFragment extends ListFragment implements PeerListListener {  // callback of requestPeers
 
-    private static final String TAG = "PTP_list";
+//    private static final String TAG = "PTP_list";
 
     private List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>();
     ProgressDialog progressDialog = null;
@@ -72,19 +72,19 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
     private static String getDeviceStatus(int deviceStatus) {
         switch (deviceStatus) {
             case WifiP2pDevice.AVAILABLE:
-                Log.d(TAG, "Peer status : AVAILABLE");
+//                Log.d(TAG, "Peer status : AVAILABLE");
                 return "Available";
             case WifiP2pDevice.INVITED:
-                Log.d(TAG, "Peer status : INVITED");
+//                Log.d(TAG, "Peer status : INVITED");
                 return "Invited";
             case WifiP2pDevice.CONNECTED:
-                Log.d(TAG, "Peer status : CONNECTED");
+//                Log.d(TAG, "Peer status : CONNECTED");
                 return "Connected";
             case WifiP2pDevice.FAILED:
-                Log.d(TAG, "Peer status : FAILED");
+//                Log.d(TAG, "Peer status : FAILED");
                 return "Failed";
             case WifiP2pDevice.UNAVAILABLE:
-                Log.d(TAG, "Peer status : UNAVAILABLE");
+//                Log.d(TAG, "Peer status : UNAVAILABLE");
                 return "Unavailable";
             default:
                 return "Unknown";
@@ -172,17 +172,15 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         peers.addAll(peerList.getDeviceList());
         ((WiFiPeerListAdapter) getListAdapter()).notifyDataSetChanged();
         if (peers.size() == 0) {
-            Log.d(WiFiDirectActivity.TAG, "No devices found");
+//            Log.d(WiFiDirectActivity.TAG, "No devices found");
             return;
         }
-
     }
 
     public void clearPeers() {
         peers.clear();
         ((WiFiPeerListAdapter) getListAdapter()).notifyDataSetChanged();
     }
-
 
     public void onInitiateDiscovery() {
         // test

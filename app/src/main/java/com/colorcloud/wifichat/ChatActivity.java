@@ -24,7 +24,7 @@ import static com.colorcloud.wifichat.Constant.MSG_REGISTER_ACTIVITY;
 
 public class ChatActivity extends Activity {
 
-    public static final String TAG = "PTP_ChatAct";
+//    public static final String TAG = "PTP_ChatAct";
 
     ChatFragment mChatFrag = null;
 
@@ -54,7 +54,7 @@ public class ChatActivity extends Activity {
                 mChatFrag = ChatFragment.newInstance(this, null, initMsg);
             }
 
-            Log.d(TAG, "initFragment : show chat fragment..." + initMsg);
+//            Log.d(TAG, "initFragment : show chat fragment..." + initMsg);
             // chat fragment on top, do not do replace, as frag_detail already hard coded in layout.
             ft.add(R.id.frag_chat, mChatFrag, "chat_frag");
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
@@ -68,7 +68,7 @@ public class ChatActivity extends Activity {
     public void onResume() {
         try {
             super.onResume();
-            Log.d(TAG, "onResume: chat activity resume, register activity to connection service !");
+//            Log.d(TAG, "onResume: chat activity resume, register activity to connection service !");
             registerActivityToService(true);
         } catch (Exception e) {
             Toast.makeText(this, "On Resume Failed", Toast.LENGTH_SHORT).show();
@@ -79,7 +79,7 @@ public class ChatActivity extends Activity {
     public void onPause() {
         try {
             super.onPause();
-            Log.d(TAG, "onPause: chat activity closed, de-register activity from connection service !");
+//            Log.d(TAG, "onPause: chat activity closed, de-register activity from connection service !");
             registerActivityToService(false);
         } catch (Exception e) {
             Toast.makeText(this, "On Pause Failed", Toast.LENGTH_SHORT).show();
@@ -90,7 +90,7 @@ public class ChatActivity extends Activity {
     public void onDestroy() {
         try {
             super.onDestroy();
-            Log.d(TAG, " onDestroy: disconnect p2p connection. ");
+//            Log.d(TAG, " onDestroy: disconnect p2p connection. ");
         } catch (Exception e) {
             Toast.makeText(this, "On Destroy Failed", Toast.LENGTH_SHORT).show();
         }
@@ -185,7 +185,7 @@ public class ChatActivity extends Activity {
      */
     public void pushOutMessage(String jsonstring) {
         try {
-            Log.d(TAG, "pushOutMessage : " + jsonstring);
+//            Log.d(TAG, "pushOutMessage : " + jsonstring);
             Message msg = ConnectionService.getInstance().getHandler().obtainMessage();
             msg.what = MSG_PUSHOUT_DATA;
             msg.obj = jsonstring;
@@ -201,7 +201,7 @@ public class ChatActivity extends Activity {
     public void showMessage(String msg) {
         try {
             MsgRow row = ChatFragment.MsgRow.parseMsgRow(msg);
-            Log.d(TAG, "showMessage : " + msg + " : " + row.mMsg);
+//            Log.d(TAG, "showMessage : " + msg + " : " + row.mMsg);
             if (mChatFrag != null) {
                 mChatFrag.appendChatMessage(row);
             }
