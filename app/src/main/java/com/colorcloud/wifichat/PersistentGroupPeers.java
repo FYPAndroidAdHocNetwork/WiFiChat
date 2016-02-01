@@ -1,6 +1,5 @@
 package com.colorcloud.wifichat;
 
-import android.net.wifi.p2p.WifiP2pConfig;
 import android.util.Log;
 
 import java.util.HashSet;
@@ -25,10 +24,10 @@ public class PersistentGroupPeers {
     }
 
     // Here a Hashset is used to avoid duplicates
-    Set<WifiP2pConfig> persistentGroupPeers = new HashSet<WifiP2pConfig>();
+    Set<String> persistentGroupPeers = new HashSet<String>();
 
-    public void add(WifiP2pConfig wifiP2pConfig) {
-        persistentGroupPeers.add(wifiP2pConfig);
+    public void add(String peerDeviceMACAddress) {
+        persistentGroupPeers.add(peerDeviceMACAddress);
         Log.d(TAG, "PersistentGroupPeers added, now the set is:");
         PersistentGroupPeers.getInstance().printPersistentGroupPeers();
     }
@@ -43,8 +42,8 @@ public class PersistentGroupPeers {
 
     // helper method for debugging
     public void printPersistentGroupPeers() {
-        for (WifiP2pConfig wifiP2pConfig : persistentGroupPeers) {
-            Log.d(TAG, wifiP2pConfig.toString());
+        for (String peerDeviceMACAddress : persistentGroupPeers) {
+            Log.d(TAG, peerDeviceMACAddress);
         }
     }
 }
