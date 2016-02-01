@@ -8,20 +8,27 @@
 
     <item
         android:id="@+id/btn_direct_discover"
-        android:icon="@drawable/ic_action_discover"
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="never"
         android:title="@string/discover_peers_button" />
 
     <item
-        android:id="@+id/btn_reset_persistent_group"
-        android:icon="@drawable/ic_action_on_off"
-        android:showAsAction="ifRoom|withText"
-        android:title="@string/reset_persistent_group_button" />
+        android:id="@+id/btn_create_group"
+        android:showAsAction="never"
+        android:title="@string/create_group" />
+
+    <item
+        android:id="@+id/btn_broadcast_connection"
+        android:showAsAction="never"
+        android:title="@string/broadcast_connection" />
 
     <item
         android:id="@+id/btn_msg"
-        android:icon="@drawable/msg"
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="never"
         android:title="@string/msg" />
+
+    <item
+        android:id="@+id/btn_reset"
+        android:showAsAction="never"
+        android:title="@string/reset" />
 
 </menu>

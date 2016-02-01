@@ -170,6 +170,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
     /**
      * p2p connection setup, proceed to setup socket connection.
      */
+    // when the device creates a group, this method would be called
     @Override
     public void onConnectionInfoAvailable(final WifiP2pInfo info) {
         if (progressDialog != null && progressDialog.isShowing()) {
@@ -204,8 +205,9 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 //            ((TextView) mContentView.findViewById(R.id.status_text)).setText(getResources().getString(R.string.client_text));
         }
 
-        // hide the connect button
+
         // todo: UI update
+        // hide the connect button
         mContentView.findViewById(R.id.btn_connect).setVisibility(View.GONE);
 //        mContentView.findViewById(R.id.btn_start_client).setVisibility(View.VISIBLE);  // enable start chat button
 

@@ -21,17 +21,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.ActionListener;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.ChannelListener;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -53,20 +51,15 @@ import java.util.List;
  */
 public class WiFiDirectActivity extends Activity implements ChannelListener, DeviceActionListener {
 
-//    public static final String TAG = "PTP_Activity";
+    public static final String TAG = "WiFiDirectActivity";
     public static String partnerDevice;
     public static WifiP2pDevice mydevice;
     public static List<WifiP2pDevice> lstPeers = new ArrayList<WifiP2pDevice>();
-
     private final IntentFilter intentFilter = new IntentFilter();
     private BroadcastReceiver receiver = null;
     private Intent serviceIntent = null;
-
-    ConnectionManager mConnMan = null;
-
     private WifiP2pManager wifiP2pManager;
     private Channel channel;
-
     private boolean isWifiP2pEnabled = false;
     private boolean retryChannel = false;
 
@@ -84,7 +77,6 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
             setContentView(R.layout.main);   // statically draw two <fragment class=>
 
             // add necessary intent values to be matched.
-
             intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
             intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
             intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
@@ -99,7 +91,6 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
             serviceIntent = new Intent(this, ConnectionService.class);
             startService(serviceIntent);  // start the connection service
 
-//            Log.d(TAG, "onCreate : home activity created wifip2p wifiP2pManager and channel: " + wifiP2pManager.toString() + " :: " + channel);
         } catch (Exception e) {
             Toast.makeText(this, "On Create Failed", Toast.LENGTH_SHORT).show();
         }
@@ -191,7 +182,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                 final DeviceListFragment fragment = (DeviceListFragment) getFragmentManager().findFragmentById(R.id.frag_list);
                 fragment.onInitiateDiscovery();  // show progressbar when discoverying.
 
-                wifiP2pManager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
+                wifiP2pManager.discoverPeers(channel, new ActionListener() {
 
                     @Override
                     public void onSuccess() {
@@ -205,11 +196,11 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 //                        List<ScanResult> scanResults = wifiManager.getScanResults();
 //
 //                        int numOfResults = scanResults.size();
-//                        Log.d("######", "num of points: " + numOfResults);
+//                        Log.d(TAG, "num of points: " + numOfResults);
 //                        for (int i = 0; i < numOfResults; i++) {
 //                            String ssid = scanResults.get(i).SSID.toString();
 //                            int rssi = scanResults.get(i).level;
-//                            Log.d("######", "ssid: " + ssid + "; rssi: " + rssi);
+//                            Log.d(TAG, "ssid: " + ssid + "; rssi: " + rssi);
 //                        }
                     }
 
@@ -220,9 +211,51 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                 });
                 return true;
 
-            case R.id.btn_reset_persistent_group:
-                PersistentGroupPeers.getInstance().reset();
-                Toast.makeText(WiFiDirectActivity.this, "Persistent groups reset", Toast.LENGTH_SHORT).show();
+            case R.id.btn_create_group:
+                channel = wifiP2pManager.initialize(this, getMainLooper(), null);
+                wifiP2pManager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
+                    @Override
+                    public void onGroupInfoAvailable(WifiP2pGroup group) {
+                        if (group != null) {
+                            wifiP2pManager.removeGroup(channel, new WifiP2pManager.ActionListener() {
+                                @Override
+                                public void onSuccess() {
+                                    wifiP2pManager.createGroup(channel, new WifiP2pManager.ActionListener() {
+                                        @Override
+                                        public void onSuccess() {
+                                        }
+
+                                        @Override
+                                        public void onFailure(int reason) {
+                                            Log.d(TAG, "failed to create persistent group: " + reason);
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onFailure(int reason) {
+                                    Log.d(TAG, "failed to remove existing group: " + reason);
+                                }
+                            });
+                        } else {
+                            wifiP2pManager.createGroup(channel, new WifiP2pManager.ActionListener() {
+                                @Override
+                                public void onSuccess() {
+                                }
+
+                                @Override
+                                public void onFailure(int reason) {
+                                    Log.d(TAG, "failed to create persistent group: " + reason);
+                                }
+                            });
+                        }
+                    }
+                });
+
+                return true;
+
+            case R.id.btn_broadcast_connection:
+                // TODO: 1/2/16 primary group owner broadcast the connection info here
                 return true;
 
             case R.id.btn_msg:
@@ -235,6 +268,11 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
                 return true;
 
+            case R.id.btn_reset:
+                PersistentGroupPeers.getInstance().reset();
+                Toast.makeText(WiFiDirectActivity.this, "Peer device list reset", Toast.LENGTH_SHORT).show();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -244,7 +282,6 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
     public void showDetails(WifiP2pDevice device) {
         DeviceDetailFragment fragment = (DeviceDetailFragment) getFragmentManager().findFragmentById(R.id.frag_detail);
         fragment.showDetails(device);
-
     }
 
     @Override
