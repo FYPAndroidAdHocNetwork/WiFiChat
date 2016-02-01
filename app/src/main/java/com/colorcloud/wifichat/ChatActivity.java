@@ -6,15 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.colorcloud.wifichat.ChatFragment.MsgRow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -200,7 +197,7 @@ public class ChatActivity extends Activity {
      */
     public void showMessage(String msg) {
         try {
-            MsgRow row = ChatFragment.MsgRow.parseMsgRow(msg);
+            MessageRow row = MessageRow.parseMsgRow(msg);
 //            Log.d(TAG, "showMessage : " + msg + " : " + row.mMsg);
             if (mChatFrag != null) {
                 mChatFrag.appendChatMessage(row);

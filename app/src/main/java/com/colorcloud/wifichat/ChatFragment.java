@@ -5,9 +5,6 @@ import android.app.ListFragment;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,11 +15,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  * chat fragment attached to main activity.
@@ -32,8 +26,8 @@ public class ChatFragment extends ListFragment {
 
     private static ChatActivity mActivity = null;
 
-    private ArrayList<MsgRow> mMessageList = null;   // a list of chat msgs.
-    private ArrayAdapter<MsgRow> mAdapter = null;
+    private ArrayList<MessageRow> mMessageList = null;   // a list of chat msgs.
+    private ArrayAdapter<MessageRow> mAdapter = null;
 
     private String mGroupOwnerAddr;
     private String mMyDeviceName;
@@ -93,7 +87,7 @@ public class ChatFragment extends ListFragment {
                     InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(inputEditText.getWindowToken(), 0);
 
-                    String formattedMsg = appendChatMessage(new MsgRow(mMyDeviceName, inputMsg, null));
+                    String formattedMsg = appendChatMessage(new MessageRow(mMyDeviceName, inputMsg, null));
 //                    Log.d(TAG, "sendButton clicked: sendOut data : " + formattedMsg);
                     mActivity.pushOutMessage(formattedMsg);
                 } else
@@ -111,7 +105,7 @@ public class ChatFragment extends ListFragment {
 //            Log.d(TAG, "onCreate : savedInstanceState: " + mMessageList.get(0).mMsg);
         } else if (mMessageList == null) {
             // no need to setContentView, just setListAdapter, but listview must be android:id="@android:id/list"
-            mMessageList = new ArrayList<MsgRow>(200);
+            mMessageList = new ArrayList<MessageRow>(200);
 //            Log.d(TAG, "onCreate : empty start : ");
         } else {
 //            Log.d(TAG, "onCreate : setRetainInstance good : ");
@@ -122,11 +116,11 @@ public class ChatFragment extends ListFragment {
 //        Log.d(TAG, "onCreate chat msg fragment: my_addr: " + mMyDeviceName + " : " + initmsg);
 
         if (initmsg != null) {
-            MsgRow row = MsgRow.parseMsgRow(initmsg);
+            MessageRow row = MessageRow.parseMsgRow(initmsg);
             mMessageList.add(row);
 //            Log.d(TAG, "onCreate : " + row.mMsg);
         } else if (mMessageList.size() == 0) {
-            mMessageList.add(new MsgRow(mMyDeviceName, mMyDeviceName + " logged in", null));
+            mMessageList.add(new MessageRow(mMyDeviceName, mMyDeviceName + " logged in", null));
         }
         setListAdapter(mAdapter);  // list fragment data adapter 
 
@@ -150,7 +144,7 @@ public class ChatFragment extends ListFragment {
     /**
      * add a chat message to the list, return the format the message as " sender_addr : msg "
      */
-    public String appendChatMessage(MsgRow msg) {
+    public String appendChatMessage(MessageRow msg) {
 //        Log.d(TAG, "appendChatMessage: chat fragment append msg: " + msg);
         mMessageList.add(msg);
         // mAdapter.add(msg);
@@ -162,11 +156,11 @@ public class ChatFragment extends ListFragment {
      * chat message adapter from list adapter.
      * Responsible for how to show data to list fragment list view.
      */
-    final class ChatMessageAdapter extends ArrayAdapter<MsgRow> {
+    final class ChatMessageAdapter extends ArrayAdapter<MessageRow> {
 
         private LayoutInflater mInflater;
 
-        public ChatMessageAdapter(Context context, List<MsgRow> objects) {
+        public ChatMessageAdapter(Context context, List<MessageRow> objects) {
             super(context, 0, objects);
             mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
@@ -182,23 +176,23 @@ public class ChatFragment extends ListFragment {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = convertView;  // old view to re-use if possible. Useful for Heterogeneous list with diff item view type.
-            MsgRow item = this.getItem(position);
+            MessageRow item = this.getItem(position);
 
             if (view == null) {
                 view = mInflater.inflate(R.layout.chat_row, null);
             }
 
             TextView sender = (TextView) view.findViewById(R.id.sender);
-            sender.setText(item.mSender);
+            sender.setText(item.getSender());
 
             TextView msgRow = (TextView) view.findViewById(R.id.msg_row);
-            msgRow.setText(item.mMsg);
+            msgRow.setText(item.getMsg());
 
             TextView time = (TextView) view.findViewById(R.id.time);
-            time.setText(item.mTime);
+            time.setText(item.getTime());
 
             // set the background color
-            if (!item.mSender.equals(mMyDeviceName)) {
+            if (!item.getSender().equals(mMyDeviceName)) {
                 // view.setBackgroundResource(R.drawable.row_bkgrd);
                 msgRow.setTextColor(Color.GREEN);
                 sender.setTextColor(Color.GREEN);
@@ -210,91 +204,6 @@ public class ChatFragment extends ListFragment {
 
 //            Log.d(TAG, "getView : " + item.mSender + " " + item.mMsg + " " + item.mTime);
             return view;
-        }
-    }
-
-    /**
-     * msg row format
-     */
-    public static class MsgRow implements Parcelable {
-        public String mSender;
-        public String mMsg;
-        public String mTime;
-        public static final String mDel = "^&^";
-
-        private MsgRow() {
-            this.mSender = null;
-            this.mTime = null;
-            this.mMsg = null;
-        }
-
-        public MsgRow(String sender, String msg, String time) {
-            mTime = time;
-            if (time == null) {
-                Date now = new Date();
-                //SimpleDateFormat timingFormat = new SimpleDateFormat("mm/dd hh:mm");
-                mTime = new SimpleDateFormat("dd/MM HH:mm").format(now);
-            }
-            mSender = sender;
-            mMsg = msg;
-        }
-
-        public MsgRow(Parcel in) {
-            readFromParcel(in);
-        }
-
-        public String toString() {
-            return mSender + mDel + mMsg + mDel + mTime;
-        }
-
-        public static MsgRow parseMsgRow(String formattedMsg) {
-            StringTokenizer st = new StringTokenizer(formattedMsg, mDel);
-            MsgRow row = new MsgRow();
-            while (st.hasMoreTokens()) {
-                // Order matters
-                if (row.mSender == null) {
-                    row.mSender = st.nextToken();
-                    continue;
-                }
-                if (row.mMsg == null) {
-                    row.mMsg = st.nextToken();
-                    continue;
-                }
-                if (row.mTime == null) {
-                    row.mTime = st.nextToken();
-                    break;  // done
-                }
-            }
-//            Log.d(TAG, "parseMsgRow : " + row.mMsg);
-            return row;
-        }
-
-        public static final Parcelable.Creator<MsgRow> CREATOR = new Parcelable.Creator<MsgRow>() {
-            public MsgRow createFromParcel(Parcel in) {
-                return new MsgRow(in);
-            }
-
-            public MsgRow[] newArray(int size) {
-                return new MsgRow[size];
-            }
-        };
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            dest.writeString(mSender);
-            dest.writeString(mMsg);
-            dest.writeString(mTime);
-        }
-
-        public void readFromParcel(Parcel in) {
-            mSender = in.readString();
-            mMsg = in.readString();
-            mTime = in.readString();
         }
     }
 }
