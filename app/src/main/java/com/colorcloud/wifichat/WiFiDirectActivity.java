@@ -39,7 +39,9 @@ import android.widget.Toast;
 
 import com.colorcloud.wifichat.DeviceListFragment.DeviceActionListener;
 
+import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -90,7 +92,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
             serviceIntent = new Intent(this, ConnectionService.class);
             startService(serviceIntent);  // start the connection service
-
+            
         } catch (Exception e) {
             Toast.makeText(this, "On Create Failed", Toast.LENGTH_SHORT).show();
         }
@@ -262,7 +264,6 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                 if (PersistentGroupPeers.getInstance().isEmpty()) {
                     Toast.makeText(WiFiDirectActivity.this, "This device does not belong to any group yet", Toast.LENGTH_SHORT).show();
                 } else {
-                    // TODO: 23/1/16 UI logics update here to replace the "start chatting" button
                     this.startChatActivity(null);
                 }
 
@@ -299,7 +300,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                 @Override
                 public void onSuccess() {
                     WiFiDirectBroadcastReceiver.connected = true;
-                    PersistentGroupPeers.getInstance().add(config);
+                    // TODO: 1/2/16 send current device's MAC address
                 }
 
                 @Override
@@ -421,7 +422,6 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
      * socket connected, update connection state.
      */
     public void onP2pConnected() {
-
         wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = wifiP2pManager.initialize(this, getMainLooper(), null);
         stopService(serviceIntent);
@@ -458,5 +458,35 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
         } catch (Exception e) {
             Toast.makeText(this, "Start chat activity Failed", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    // MAC address used in WiFi-direct is different from that in WiFi
+    public String getWiFiDirectMacAddress() {
+        try {
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface ntwInterface : interfaces) {
+
+                if (ntwInterface.getName().equalsIgnoreCase("p2p0")) {
+                    byte[] byteMac = ntwInterface.getHardwareAddress();
+                    if (byteMac == null) {
+                        return null;
+                    }
+                    StringBuilder strBuilder = new StringBuilder();
+                    for (int i = 0; i < byteMac.length; i++) {
+                        strBuilder.append(String.format("%02X:", byteMac[i]));
+                    }
+
+                    if (strBuilder.length() > 0) {
+                        strBuilder.deleteCharAt(strBuilder.length() - 1);
+                    }
+
+                    return strBuilder.toString();
+                }
+
+            }
+        } catch (Exception e) {
+            Log.d(TAG, e.getMessage());
+        }
+        return null;
     }
 }

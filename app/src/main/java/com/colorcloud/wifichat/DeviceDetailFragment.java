@@ -205,11 +205,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 //            ((TextView) mContentView.findViewById(R.id.status_text)).setText(getResources().getString(R.string.client_text));
         }
 
-
-        // todo: UI update
-        // hide the connect button
         mContentView.findViewById(R.id.btn_connect).setVisibility(View.GONE);
-//        mContentView.findViewById(R.id.btn_start_client).setVisibility(View.VISIBLE);  // enable start chat button
 
 //        Log.d(TAG, "onConnectionInfoAvailable: socket connection established, show start chat button ! ");
         ((WiFiDirectActivity) getActivity()).onP2pConnected();  // p2p connected, socket server and client selector started.
@@ -228,7 +224,6 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         view.setText(device.deviceAddress);
         view = (TextView) mContentView.findViewById(R.id.device_info);
         view.setText(device.toString());
-
     }
 
     /**

@@ -16,10 +16,6 @@
 
 package com.colorcloud.wifichat;
 
-import com.colorcloud.wifichat.R;
-import com.colorcloud.wifichat.DeviceListFragment.DeviceActionListener;
-
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -29,26 +25,22 @@ import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.net.wifi.p2p.WifiP2pManager.ActionListener;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * A BroadcastReceiver that notifies of important wifi p2p events.
  */
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
-//    private static final String TAG = "PTP_Recv";
+    private static final String TAG = "BroadcastReceiver";
     public static boolean connected = false;
 
     private WifiP2pManager manager;
-    private WifiP2pDevice device;
     private Channel channel;
     private WiFiDirectActivity activity;
-    ProgressDialog progressDialog = null;
 
     public WiFiDirectBroadcastReceiver() {
         super();
@@ -75,8 +67,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         try {
             String action = intent.getAction();
-            if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {  // this devices's wifi direct enabled state.
-
+            if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {  // this device's wifi direct enabled state.
                 // UI update to indicate wifi p2p status.
                 int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
                 if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
@@ -89,7 +80,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 //                Log.d(TAG, " WIFI_P2P_STATE_CHANGED_ACTION = " + state);
             } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
                 // a list of peers are available after discovery, use PeerListListener to collect
-
                 // request available peers from the wifi p2p manager. This is an
                 // asynchronous call and the calling activity is notified with a
                 // callback on PeerListListener.onPeersAvailable()
@@ -180,7 +170,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 //                Log.d(TAG, "WIFI_P2P_THIS_DEVICE_CHANGED_ACTION ");
             }
         } catch (Exception e) {
-            Log.e("WiFiDirectBroadcastReceiver", "Error: " + e.toString());
+            Log.e(TAG, "Error: " + e.toString());
 //            Toast.makeText(context, "Disconnected", Toast.LENGTH_SHORT).show();
             NetworkInfo networkInfo = (NetworkInfo) intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
 //            Log.d(TAG, "Partner ID 1: " + WiFiDirectActivity.partnerDevice);
@@ -209,9 +199,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                     WifiP2pConfig config = new WifiP2pConfig();
                     config.deviceAddress = WiFiDirectActivity.partnerDevice;
                     config.wps.setup = WpsInfo.PBC;
-//                    Log.d(TAG, "Before Connecting to partner");
                     activity.connect(config);
-//                    Log.d(TAG, "After Connecting to partner");
                     if (networkInfo.isConnectedOrConnecting()) {
                         Handler handler = new Handler();
                         handler.postDelayed(new Runnable() {
@@ -221,7 +209,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                         }, 2000);
                     }
                 } catch (Exception ex) {
-                    Log.e("WiFiDirectBroadcastReceiver", "2 error: " + ex.toString());
+                    Log.e(TAG, "2 error: " + ex.toString());
                     Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
                         public void run() {
