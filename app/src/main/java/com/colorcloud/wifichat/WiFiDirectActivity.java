@@ -261,11 +261,14 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                 return true;
 
             case R.id.btn_msg:
-                if (PersistentGroupPeers.getInstance().isEmpty()) {
-                    Toast.makeText(WiFiDirectActivity.this, "This device does not belong to any group yet", Toast.LENGTH_SHORT).show();
-                } else {
-                    this.startChatActivity(null);
-                }
+                // TODO: 1/2/16 uncomment below when the logics are complete
+//                if (PersistentGroupPeers.getInstance().isEmpty()) {
+//                    Toast.makeText(WiFiDirectActivity.this, "This device does not belong to any group yet", Toast.LENGTH_SHORT).show();
+//                } else {
+//                    this.startChatActivity(null);
+//                }
+
+                this.startChatActivity(null);
 
                 return true;
 

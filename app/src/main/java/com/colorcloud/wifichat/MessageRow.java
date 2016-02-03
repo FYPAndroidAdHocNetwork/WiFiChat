@@ -27,7 +27,7 @@ public class MessageRow implements Parcelable {
     public MessageRow(String sender, String msg, String time) {
         if (time == null) {
             Date now = new Date();
-            this.time = new SimpleDateFormat("dd-M-yyyy hh:mm:ss").format(now);
+            this.time = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").format(now);
         } else {
             this.time = time;
         }

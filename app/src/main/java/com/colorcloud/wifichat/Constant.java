@@ -16,4 +16,11 @@ public final class Constant {
     public static final int MSG_SELECT_ERROR = 2001;
     public static final int MSG_BROKEN_CONN = 2002;  // network disconnect
 
+    // message format
+    public static final int DEVICE_MAC_ADDRESS = 1;
+    public static final int GROUP_MAC_ADDRESS = 2;
+    public static final int MESSAGE = 3;
+    public static final int IMMEDIATE_ACKNOWLEDGEMENT = 4;
+    public static final int ROUTING_ACKNOWLEDGEMENT = 5;
+
 }
