@@ -269,9 +269,8 @@ public class ConnectionManager {
      * client send data into server, server pub to all clients.
      */
     public void onDataIn(SocketChannel schannel, String data) {
-//        Log.d(TAG, "connection onDataIn : " + data);
-        //Toast.makeText(this.mContext,"connection onDataIn : " + data,  Toast.LENGTH_SHORT).show();
-        if (mIsServer) {  // push all _other_ clients if the device is the server
+        // push all other clients if the device is the server
+        if (mIsServer) {
             pubDataToAllClients(data, schannel);
         }
     }

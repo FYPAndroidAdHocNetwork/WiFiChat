@@ -87,8 +87,11 @@ public class ChatFragment extends ListFragment {
                     InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(inputEditText.getWindowToken(), 0);
 
-                    String formattedMsg = appendChatMessage(new MessageRow(mMyDeviceName, inputMsg, null));
-//                    Log.d(TAG, "sendButton clicked: sendOut data : " + formattedMsg);
+                    MessageRow messageRow = new MessageRow(mMyDeviceName, inputMsg, null);
+                    MessageWrapper messageWrapper = new MessageWrapper(Constant.MESSAGE, messageRow.toString());
+                    appendChatMessage(messageRow);
+                    String formattedMsg = messageWrapper.toString();
+
                     mActivity.pushOutMessage(formattedMsg);
                 } else
                     Toast.makeText(getActivity(), "Please input text", Toast.LENGTH_SHORT).show();
@@ -144,12 +147,11 @@ public class ChatFragment extends ListFragment {
     /**
      * add a chat message to the list, return the format the message as " sender_addr : msg "
      */
-    public String appendChatMessage(MessageRow msg) {
+    public void appendChatMessage(MessageRow msg) {
 //        Log.d(TAG, "appendChatMessage: chat fragment append msg: " + msg);
         mMessageList.add(msg);
         // mAdapter.add(msg);
         mAdapter.notifyDataSetChanged();  // notify the attached observer and views to refresh.
-        return msg.toString();
     }
 
     /**

@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
 import java.nio.channels.SocketChannel;
 
@@ -27,7 +28,7 @@ import static com.colorcloud.wifichat.Constant.MSG_STARTSERVER;
 
 public class ConnectionService extends Service {
 
-//	private static final String TAG = "PTP_Serv";
+    private static final String TAG = "ConnectionService";
 
     private static ConnectionService _sinstance = null;
 
@@ -102,7 +103,6 @@ public class ConnectionService extends Service {
      * @param msg
      */
     private void processMessage(android.os.Message msg) {
-//    	Log.d(TAG, "processMessage: " + msg.what);
         switch (msg.what) {
             case MSG_NULL:
                 break;
@@ -121,6 +121,7 @@ public class ConnectionService extends Service {
             case MSG_FINISH_CONNECT:
                 mConnMan.onFinishConnect((SocketChannel) msg.obj);
                 break;
+            // msg coming in
             case MSG_PULLIN_DATA:
                 onPullInData((SocketChannel) msg.obj, msg.getData());
                 break;
@@ -155,12 +156,40 @@ public class ConnectionService extends Service {
      */
     private String onPullInData(SocketChannel schannel, Bundle b) {
         String data = b.getString("DATA");
-//    	Log.d(TAG, "onDataIn : recvd msg : " + data);
-        mConnMan.onDataIn(schannel, data);  // pub to all client if this device is server.
 
-        // uncomment below line will enable the App to issue push notification upon receiving messages
-//    	showNotification(data);
-        showInActivity(data);
+        MessageWrapper messageWrapper = MessageWrapper.parseMessageWrapper(data);
+        int category = messageWrapper.getCategory();
+        String messageBody = messageWrapper.getMessageBody();
+
+        Log.d(TAG, "onPullInData: category is: " + category);
+
+        switch (category) {
+            case Constant.DEVICE_MAC_ADDRESS:
+
+                break;
+
+            case Constant.GROUP_MAC_ADDRESS:
+
+                break;
+
+            case Constant.MESSAGE:
+                // pub to all client if this device is server.
+                mConnMan.onDataIn(schannel, data);
+                // uncomment below line will enable the App to issue push notification upon receiving messages
+                //showNotification(data);
+                showInActivity(messageBody);
+
+                break;
+
+            case Constant.IMMEDIATE_ACKNOWLEDGEMENT:
+
+                break;
+
+            case Constant.ROUTING_ACKNOWLEDGEMENT:
+
+                break;
+        }
+
         return data;
     }
 
@@ -170,7 +199,6 @@ public class ConnectionService extends Service {
      * If the sender is client, only can send to the server.
      */
     private void onPushOutData(String data) {
-//    	Log.d(TAG, "onPushOutData : " + data);
         mConnMan.pushOutData(data);
     }
 
