@@ -12,7 +12,7 @@ import java.util.StringTokenizer;
  */
 public class MessageRow implements Parcelable {
 
-    private static final String STRING_TOKEN = "^&^";
+    private static final String MESSAGE_ROW_TOKEN = "^&^";
 
     private String sender;
     private String msg;
@@ -53,11 +53,11 @@ public class MessageRow implements Parcelable {
     }
 
     public String toString() {
-        return sender + STRING_TOKEN + msg + STRING_TOKEN + time;
+        return sender + MESSAGE_ROW_TOKEN + msg + MESSAGE_ROW_TOKEN + time;
     }
 
     public static MessageRow parseMsgRow(String formattedMsg) {
-        StringTokenizer st = new StringTokenizer(formattedMsg, STRING_TOKEN);
+        StringTokenizer st = new StringTokenizer(formattedMsg, MESSAGE_ROW_TOKEN);
         MessageRow row = new MessageRow();
         while (st.hasMoreTokens()) {
             // Order matters
