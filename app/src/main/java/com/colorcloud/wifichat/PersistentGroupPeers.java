@@ -2,8 +2,8 @@ package com.colorcloud.wifichat;
 
 import android.util.Log;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by wangqilin on 21/1/16.
@@ -23,10 +23,17 @@ public class PersistentGroupPeers {
         return instance;
     }
 
-    // Here a Hashset is used to avoid duplicates
-    Set<String> persistentGroupPeers = new HashSet<String>();
+    // Here a ArrayList is used to preserve the orders
+    List<String> persistentGroupPeers = new ArrayList<String>();
 
     public void add(String peerDeviceMACAddress) {
+        for (String existingMACAddress: persistentGroupPeers) {
+            if (existingMACAddress.equals(peerDeviceMACAddress)) {
+                Log.d(TAG, "a duplicate mac address");
+                return;
+            }
+        }
+
         persistentGroupPeers.add(peerDeviceMACAddress);
         Log.d(TAG, "PersistentGroupPeers added, now the set is:");
         PersistentGroupPeers.getInstance().printPersistentGroupPeers();
@@ -42,6 +49,7 @@ public class PersistentGroupPeers {
 
     // helper method for debugging
     public void printPersistentGroupPeers() {
+        Log.d(TAG, "number of items in the peer list: " + persistentGroupPeers.size());
         for (String peerDeviceMACAddress : persistentGroupPeers) {
             Log.d(TAG, peerDeviceMACAddress);
         }

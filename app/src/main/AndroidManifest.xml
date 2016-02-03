@@ -37,14 +37,15 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".WiFiDirectBroadcastReceiver">
-            <intent-filter>
-                <action android:name="android.net.wifi.p2p.STATE_CHANGED" />
-                <action android:name="android.net.wifi.p2p.PEERS_CHANGED" />
-                <action android:name="android.net.wifi.p2p.THIS_DEVICE_CHANGED" />
-                <action android:name="android.net.wifi.p2p.CONNECTION_STATE_CHANGE" />
-            </intent-filter>
-        </receiver>
+        <!-- comment the below part, as BroadcastReceiver is dynamically registered in WiFiDirectActivity -->
+        <!--<receiver android:name=".WiFiDirectBroadcastReceiver">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.net.wifi.p2p.STATE_CHANGED" />-->
+                <!--<action android:name="android.net.wifi.p2p.PEERS_CHANGED" />-->
+                <!--<action android:name="android.net.wifi.p2p.THIS_DEVICE_CHANGED" />-->
+                <!--<action android:name="android.net.wifi.p2p.CONNECTION_STATE_CHANGE" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
 
         <activity android:name=".ChatActivity"></activity>
 
