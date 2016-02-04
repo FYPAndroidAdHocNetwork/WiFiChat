@@ -92,7 +92,7 @@ public class ChatFragment extends ListFragment {
                     appendChatMessage(messageRow);
                     String formattedMsg = messageWrapper.toString();
 
-                    mActivity.pushOutMessage(formattedMsg);
+                    ChatActivity.pushOutMessage(formattedMsg);
                 } else
                     Toast.makeText(getActivity(), "Please input text", Toast.LENGTH_SHORT).show();
             }

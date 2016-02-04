@@ -165,7 +165,9 @@ public class ConnectionService extends Service {
 
         switch (category) {
             case Constant.DEVICE_MAC_ADDRESS:
-
+                // in this case, the messageBody is the device's MAC address
+                Log.d(TAG, "client device's MAC address is: " + messageBody);
+                PersistentGroupPeers.getInstance().add(messageBody);
                 break;
 
             case Constant.GROUP_MAC_ADDRESS:

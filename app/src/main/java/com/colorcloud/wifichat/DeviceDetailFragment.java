@@ -52,7 +52,7 @@ import java.net.Socket;
  */
 public class DeviceDetailFragment extends Fragment implements ConnectionInfoListener {
 
-//    private static final String TAG = "PTP_Detail";
+    private static final String TAG = "DeviceDetailFragment";
 
     protected static final int CHOOSE_FILE_RESULT_CODE = 20;
     private View mContentView = null;
@@ -206,6 +206,12 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         }
 
         mContentView.findViewById(R.id.btn_connect).setVisibility(View.GONE);
+
+        // if this connected device is not group owner, send its MAC to owner to construct the peer list
+        if (!info.isGroupOwner) {
+            MessageWrapper messageWrapper = new MessageWrapper(Constant.DEVICE_MAC_ADDRESS, WiFiDirectActivity.getWiFiDirectMacAddress());
+            ChatActivity.pushOutMessage(messageWrapper.toString());
+        }
 
 //        Log.d(TAG, "onConnectionInfoAvailable: socket connection established, show start chat button ! ");
         ((WiFiDirectActivity) getActivity()).onP2pConnected();  // p2p connected, socket server and client selector started.

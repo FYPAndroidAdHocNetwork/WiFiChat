@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,7 @@ import static com.colorcloud.wifichat.Constant.MSG_REGISTER_ACTIVITY;
 
 public class ChatActivity extends Activity {
 
-//    public static final String TAG = "PTP_ChatAct";
+    public static final String TAG = "ChatActivity";
 
     ChatFragment mChatFrag = null;
 
@@ -180,16 +181,12 @@ public class ChatActivity extends Activity {
     /**
      * post send msg to service to handle it in background.
      */
-    public void pushOutMessage(String jsonstring) {
-        try {
-//            Log.d(TAG, "pushOutMessage : " + jsonstring);
-            Message msg = ConnectionService.getInstance().getHandler().obtainMessage();
-            msg.what = MSG_PUSHOUT_DATA;
-            msg.obj = jsonstring;
-            ConnectionService.getInstance().getHandler().sendMessage(msg);
-        } catch (Exception e) {
-            Toast.makeText(this, "Push Out Msg Failed", Toast.LENGTH_SHORT).show();
-        }
+    public static void pushOutMessage(String jsonstring) {
+        Log.d(TAG, "pushOutMessage : " + jsonstring);
+        Message msg = ConnectionService.getInstance().getHandler().obtainMessage();
+        msg.what = MSG_PUSHOUT_DATA;
+        msg.obj = jsonstring;
+        ConnectionService.getInstance().getHandler().sendMessage(msg);
     }
 
     /**

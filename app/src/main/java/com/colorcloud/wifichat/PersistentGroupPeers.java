@@ -27,7 +27,7 @@ public class PersistentGroupPeers {
     List<String> persistentGroupPeers = new ArrayList<String>();
 
     public void add(String peerDeviceMACAddress) {
-        for (String existingMACAddress: persistentGroupPeers) {
+        for (String existingMACAddress : persistentGroupPeers) {
             if (existingMACAddress.equals(peerDeviceMACAddress)) {
                 Log.d(TAG, "a duplicate mac address");
                 return;
@@ -49,7 +49,7 @@ public class PersistentGroupPeers {
 
     // helper method for debugging
     public void printPersistentGroupPeers() {
-        Log.d(TAG, "number of items in the peer list: " + persistentGroupPeers.size());
+        Log.d(TAG, "number of items: " + persistentGroupPeers.size());
         for (String peerDeviceMACAddress : persistentGroupPeers) {
             Log.d(TAG, peerDeviceMACAddress);
         }

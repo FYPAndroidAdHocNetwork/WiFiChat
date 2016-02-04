@@ -92,7 +92,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
             serviceIntent = new Intent(this, ConnectionService.class);
             startService(serviceIntent);  // start the connection service
-            
+
         } catch (Exception e) {
             Toast.makeText(this, "On Create Failed", Toast.LENGTH_SHORT).show();
         }
@@ -113,6 +113,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
             ((WiFiChatApp) getApplication()).mP2pChannel = channel;
             ((WiFiChatApp) getApplication()).mHomeActivity = this;
+
             receiver = new WiFiDirectBroadcastReceiver(wifiP2pManager, channel, this);
             registerReceiver(receiver, intentFilter);
 
@@ -225,6 +226,8 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                                     wifiP2pManager.createGroup(channel, new WifiP2pManager.ActionListener() {
                                         @Override
                                         public void onSuccess() {
+                                            // add current device's MAC into the peer list
+                                            PersistentGroupPeers.getInstance().add(getWiFiDirectMacAddress());
                                         }
 
                                         @Override
@@ -243,6 +246,8 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                             wifiP2pManager.createGroup(channel, new WifiP2pManager.ActionListener() {
                                 @Override
                                 public void onSuccess() {
+                                    // add current device's MAC into the peer list
+                                    PersistentGroupPeers.getInstance().add(getWiFiDirectMacAddress());
                                 }
 
                                 @Override
@@ -258,6 +263,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
             case R.id.btn_broadcast_connection:
                 // TODO: 1/2/16 primary group owner broadcast the connection info here
+                PersistentGroupPeers.getInstance().printPersistentGroupPeers();
                 return true;
 
             case R.id.btn_msg:
@@ -303,7 +309,6 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                 @Override
                 public void onSuccess() {
                     WiFiDirectBroadcastReceiver.connected = true;
-                    // TODO: 1/2/16 send current device's MAC address
                 }
 
                 @Override
@@ -464,7 +469,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
     }
 
     // MAC address used in WiFi-direct is different from that in WiFi
-    public String getWiFiDirectMacAddress() {
+    public static String getWiFiDirectMacAddress() {
         try {
             List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
             for (NetworkInterface ntwInterface : interfaces) {
