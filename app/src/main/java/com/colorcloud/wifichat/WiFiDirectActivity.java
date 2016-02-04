@@ -44,6 +44,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.colorcloud.wifichat.Constant.GROUP_MAC_ADDRESS;
+
 /**
  * An activity that uses WiFi Direct APIs to discover and connect with available
  * devices. WiFi Direct APIs are asynchronous and rely on callback mechanism
@@ -263,7 +265,9 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
             case R.id.btn_broadcast_connection:
                 // TODO: 1/2/16 primary group owner broadcast the connection info here
-
+                String formattedString  = PersistentGroupPeers.getInstance().toString();
+                MessageWrapper messageWrapper = new MessageWrapper(GROUP_MAC_ADDRESS, formattedString);
+                ChatActivity.pushOutMessage(messageWrapper.toString());
                 return true;
 
             case R.id.btn_msg:

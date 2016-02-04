@@ -4,7 +4,9 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
+import static com.colorcloud.wifichat.Constant.MESSAGE_WRAPPER_TOKEN;
 import static com.colorcloud.wifichat.Constant.PERSISTENT_GROUP_PEERS_TOKEN;
 
 /**
@@ -51,7 +53,27 @@ public class PersistentGroupPeers {
 
     @Override
     public String toString() {
-        return super.toString();
+        String formattedString = "";
+
+        for (int i = 0; i < persistentGroupPeers.size(); i++) {
+            formattedString = formattedString + persistentGroupPeers.get(i) + PERSISTENT_GROUP_PEERS_TOKEN;
+        }
+
+        // stripe off the last 3 token chars
+        formattedString = formattedString.substring(0, formattedString.length() - 3);
+
+        return formattedString;
+    }
+
+    public static ArrayList<String> parsePersistentGroupPeersString(String string) {
+        StringTokenizer stringTokenizer = new StringTokenizer(string, PERSISTENT_GROUP_PEERS_TOKEN);
+        ArrayList<String> list = new ArrayList<String>();
+
+        while (stringTokenizer.hasMoreTokens()) {
+            list.add(stringTokenizer.nextToken());
+        }
+
+        return list;
     }
 
     // helper method for debugging

@@ -181,11 +181,11 @@ public class ChatActivity extends Activity {
     /**
      * post send msg to service to handle it in background.
      */
-    public static void pushOutMessage(String jsonstring) {
-        Log.d(TAG, "pushOutMessage : " + jsonstring);
+    public static void pushOutMessage(String formattedString) {
+        Log.d(TAG, "pushOutMessage : " + formattedString);
         Message msg = ConnectionService.getInstance().getHandler().obtainMessage();
         msg.what = MSG_PUSHOUT_DATA;
-        msg.obj = jsonstring;
+        msg.obj = formattedString;
         ConnectionService.getInstance().getHandler().sendMessage(msg);
     }
 

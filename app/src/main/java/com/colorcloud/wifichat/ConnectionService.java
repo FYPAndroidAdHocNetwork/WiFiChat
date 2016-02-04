@@ -14,6 +14,7 @@ import android.os.Message;
 import android.util.Log;
 
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
 
 import static com.colorcloud.wifichat.Constant.*;
 
@@ -162,7 +163,10 @@ public class ConnectionService extends Service {
                 break;
 
             case Constant.GROUP_MAC_ADDRESS:
-
+                Log.d(TAG, "GROUP_MAC_ADDRESS: " + messageBody);
+                ArrayList<String> persistentGroupPeers = PersistentGroupPeers.parsePersistentGroupPeersString(messageBody);
+                PersistentGroupPeers.getInstance().reset();
+                PersistentGroupPeers.getInstance().persistentGroupPeers = persistentGroupPeers;
                 break;
 
             case Constant.MESSAGE:
