@@ -5,6 +5,8 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.colorcloud.wifichat.Constant.PERSISTENT_GROUP_PEERS_TOKEN;
+
 /**
  * Created by wangqilin on 21/1/16.
  */
@@ -45,6 +47,11 @@ public class PersistentGroupPeers {
 
     public boolean isEmpty() {
         return persistentGroupPeers.size() == 0 ? true : false;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 
     // helper method for debugging

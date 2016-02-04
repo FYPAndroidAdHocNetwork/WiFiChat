@@ -23,4 +23,9 @@ public final class Constant {
     public static final int IMMEDIATE_ACKNOWLEDGEMENT = 4;
     public static final int ROUTING_ACKNOWLEDGEMENT = 5;
 
+    // Tokens for different message types
+    public static final String MESSAGE_ROW_TOKEN = "^&^";
+    public static final String MESSAGE_WRAPPER_TOKEN = "#$#";
+    public static final String PERSISTENT_GROUP_PEERS_TOKEN = "&*&";
+
 }

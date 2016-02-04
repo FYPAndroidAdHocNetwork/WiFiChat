@@ -15,16 +15,7 @@ import android.util.Log;
 
 import java.nio.channels.SocketChannel;
 
-import static com.colorcloud.wifichat.Constant.MSG_BROKEN_CONN;
-import static com.colorcloud.wifichat.Constant.MSG_FINISH_CONNECT;
-import static com.colorcloud.wifichat.Constant.MSG_NEW_CLIENT;
-import static com.colorcloud.wifichat.Constant.MSG_NULL;
-import static com.colorcloud.wifichat.Constant.MSG_PULLIN_DATA;
-import static com.colorcloud.wifichat.Constant.MSG_PUSHOUT_DATA;
-import static com.colorcloud.wifichat.Constant.MSG_REGISTER_ACTIVITY;
-import static com.colorcloud.wifichat.Constant.MSG_SELECT_ERROR;
-import static com.colorcloud.wifichat.Constant.MSG_STARTCLIENT;
-import static com.colorcloud.wifichat.Constant.MSG_STARTSERVER;
+import static com.colorcloud.wifichat.Constant.*;
 
 public class ConnectionService extends Service {
 

@@ -2,12 +2,12 @@ package com.colorcloud.wifichat;
 
 import java.util.StringTokenizer;
 
+import static com.colorcloud.wifichat.Constant.MESSAGE_WRAPPER_TOKEN;
+
 /**
  * Created by wangqilin on 1/2/16.
  */
 public class MessageWrapper {
-
-    private static final String MESSAGE_WRAPPER_TOKEN = "#$#";
 
     private int category;
     private String messageBody;

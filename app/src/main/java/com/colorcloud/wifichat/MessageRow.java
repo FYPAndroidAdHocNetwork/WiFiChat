@@ -7,12 +7,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.StringTokenizer;
 
+import static com.colorcloud.wifichat.Constant.MESSAGE_ROW_TOKEN;
+
 /**
  * Created by wangqilin on 5/10/15.
  */
 public class MessageRow implements Parcelable {
-
-    private static final String MESSAGE_ROW_TOKEN = "^&^";
 
     private String sender;
     private String msg;

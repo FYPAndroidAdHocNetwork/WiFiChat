@@ -263,7 +263,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
             case R.id.btn_broadcast_connection:
                 // TODO: 1/2/16 primary group owner broadcast the connection info here
-                PersistentGroupPeers.getInstance().printPersistentGroupPeers();
+
                 return true;
 
             case R.id.btn_msg:
@@ -281,6 +281,10 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
             case R.id.btn_reset:
                 PersistentGroupPeers.getInstance().reset();
                 Toast.makeText(WiFiDirectActivity.this, "Peer device list reset", Toast.LENGTH_SHORT).show();
+                return true;
+
+            case R.id.btn_print_list:
+                PersistentGroupPeers.getInstance().printPersistentGroupPeers();
                 return true;
 
             default:
