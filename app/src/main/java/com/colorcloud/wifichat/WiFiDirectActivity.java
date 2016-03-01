@@ -264,7 +264,6 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                 return true;
 
             case R.id.btn_broadcast_connection:
-                // TODO: 1/2/16 primary group owner broadcast the connection info here
                 String formattedString  = PersistentGroupPeers.getInstance().toString();
                 MessageWrapper messageWrapper = new MessageWrapper(GROUP_MAC_ADDRESS, formattedString);
                 ChatActivity.pushOutMessage(messageWrapper.toString());
@@ -272,17 +271,16 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
             case R.id.btn_msg:
                 // TODO: 1/2/16 uncomment below when the logics are complete
-//                if (PersistentGroupPeers.getInstance().isEmpty()) {
-//                    Toast.makeText(WiFiDirectActivity.this, "This device does not belong to any group yet", Toast.LENGTH_SHORT).show();
-//                } else {
-//                    this.startChatActivity(null);
-//                }
+                if (!PersistentGroupPeers.getInstance().isMessagingAllowed()) {
+                    Toast.makeText(WiFiDirectActivity.this, "This device does not belong to any group yet", Toast.LENGTH_SHORT).show();
+                }
 
                 this.startChatActivity(null);
 
                 return true;
 
             case R.id.btn_reset:
+                // todo: clear peer list and acks
                 PersistentGroupPeers.getInstance().reset();
                 Toast.makeText(WiFiDirectActivity.this, "Peer device list reset", Toast.LENGTH_SHORT).show();
                 return true;
@@ -462,7 +460,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
             // only starts chat activity when p2p connected
             if (!((WiFiChatApp) getApplication()).mP2pConnected) {
-//                Log.d(TAG, "startChatActivity : p2p connection is missing, do nothng...");
+//                Log.d(TAG, "startChatActivity : p2p connection is missing, do nothing...");
                 return;
             }
 

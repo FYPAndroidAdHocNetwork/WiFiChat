@@ -30,7 +30,7 @@ public class MessageWrapper {
         this.messageBody = messageBody;
 
 //         ACK is only a meaningful field with the type MESSAGE
-        if (category == Constant.MESSAGE) {
+        if (category == MESSAGE) {
             byte bytes[] = messageBody.getBytes();
             Checksum checksum = new CRC32();
             checksum.update(bytes, 0, bytes.length);
