@@ -269,6 +269,15 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                 String formattedString  = PersistentGroupPeers.getInstance().toString();
                 MessageWrapper messageWrapper = new MessageWrapper(GROUP_MAC_ADDRESS, formattedString);
                 ChatActivity.pushOutMessage(messageWrapper.toString());
+
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                this.disconnect(); // disconnect and enters multihopState
+
                 return true;
 
             case R.id.btn_msg:

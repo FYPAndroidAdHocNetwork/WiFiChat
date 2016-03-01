@@ -140,7 +140,6 @@ public class SelectorAsyncTask extends AsyncTask<Void, Void, Void> {
             int numBytesRead = sChannel.read(buf);
             if (numBytesRead == -1) {
                 // read -1 means socket channel is broken.
-                Log.e("SelectorAsyncTask", "readData : channel closed due to read -1: ");
                 notifyConnectionService(MSG_BROKEN_CONN, sChannel, null);
                 // sChannel.close();
             } else {

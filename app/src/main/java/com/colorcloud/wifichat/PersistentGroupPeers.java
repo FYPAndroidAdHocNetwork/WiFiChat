@@ -26,6 +26,10 @@ public class PersistentGroupPeers {
         return instance;
     }
 
+    public List<String> getPersistentGroupPeers() {
+        return persistentGroupPeers;
+    }
+
     // Here a ArrayList is used to preserve the orders
     List<String> persistentGroupPeers = new ArrayList<String>();
 
