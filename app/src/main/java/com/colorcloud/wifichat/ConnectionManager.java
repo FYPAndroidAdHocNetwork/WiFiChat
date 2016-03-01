@@ -172,6 +172,7 @@ public class ConnectionManager {
 //            Log.d(TAG, "startServerSelector : started: " + sServerChannel.socket().getLocalSocketAddress().toString());
             //Toast.makeText(this.mContext,"startServerSelector : started: " + sServerChannel.socket().getLocalSocketAddress().toString(),  Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
+            // TODO: 1/3/16 how to solve this exception?
             Log.e(TAG, "startServerSelector exception: " + e.toString());
             //Toast.makeText(this.mContext,"startServerSelector : exception: ",  Toast.LENGTH_SHORT).show();
             return -1;

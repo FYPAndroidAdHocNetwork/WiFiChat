@@ -170,15 +170,25 @@ public class ConnectionService extends Service {
                 break;
 
             case Constant.MESSAGE:
+                // reply ack immediately
+                long ack = messageWrapper.getAck();
+                Log.d(TAG, "ack is " + ack);
+                MessageWrapper repliedMessage = new MessageWrapper(IMMEDIATE_ACKNOWLEDGEMENT, "" + ack);
+                ChatActivity.pushOutMessage(repliedMessage.toString());
+
                 // pub to all client if this device is server.
                 mConnMan.onDataIn(schannel, data);
+
                 // uncomment below line will enable the App to issue push notification upon receiving messages
                 //showNotification(data);
+
                 showInActivity(messageBody);
 
                 break;
 
             case Constant.IMMEDIATE_ACKNOWLEDGEMENT:
+                long ack1 = Long.parseLong(messageWrapper.getMessageBody());
+                Log.d(TAG, "received ack: " + ack1);
 
                 break;
 
