@@ -163,6 +163,9 @@ public class ConnectionService extends Service {
                 break;
 
             case Constant.GROUP_MAC_ADDRESS:
+                // since GROUP_MAC_ADDRESS is sent by group owner, the whole group enters the multihopState
+                WiFiDirectActivity.multihopState = true;
+
                 Log.d(TAG, "GROUP_MAC_ADDRESS: " + messageBody);
                 ArrayList<String> persistentGroupPeers = PersistentGroupPeers.parsePersistentGroupPeersString(messageBody);
                 PersistentGroupPeers.getInstance().reset();

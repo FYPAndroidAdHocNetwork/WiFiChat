@@ -32,8 +32,8 @@
         android:title="@string/reset" />
 
     <item
-        android:id="@+id/btn_print_list"
+        android:id="@+id/btn_debug"
         android:showAsAction="never"
-        android:title="DEBUG: Print peer list" />
+        android:title="[[DEBUG]]" />
 
 </menu>

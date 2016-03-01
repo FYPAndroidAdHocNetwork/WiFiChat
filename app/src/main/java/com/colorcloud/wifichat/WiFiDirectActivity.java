@@ -56,6 +56,7 @@ import static com.colorcloud.wifichat.Constant.GROUP_MAC_ADDRESS;
 public class WiFiDirectActivity extends Activity implements ChannelListener, DeviceActionListener {
 
     public static final String TAG = "WiFiDirectActivity";
+    public static boolean multihopState = false;
     public static String partnerDevice;
     public static WifiP2pDevice mydevice;
     public static List<WifiP2pDevice> lstPeers = new ArrayList<WifiP2pDevice>();
@@ -264,6 +265,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                 return true;
 
             case R.id.btn_broadcast_connection:
+                WiFiDirectActivity.multihopState = true;
                 String formattedString  = PersistentGroupPeers.getInstance().toString();
                 MessageWrapper messageWrapper = new MessageWrapper(GROUP_MAC_ADDRESS, formattedString);
                 ChatActivity.pushOutMessage(messageWrapper.toString());
@@ -276,17 +278,18 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                 }
 
                 this.startChatActivity(null);
-
                 return true;
 
             case R.id.btn_reset:
-                // todo: clear peer list and acks
+                // todo: clear peer list and acks, reset state to conventional state
+                WiFiDirectActivity.multihopState = false;
                 PersistentGroupPeers.getInstance().reset();
                 Toast.makeText(WiFiDirectActivity.this, "Peer device list reset", Toast.LENGTH_SHORT).show();
                 return true;
 
-            case R.id.btn_print_list:
+            case R.id.btn_debug:
                 PersistentGroupPeers.getInstance().printPersistentGroupPeers();
+                Log.d(TAG, "the state is multi-hop state? " + multihopState);
                 return true;
 
             default:
