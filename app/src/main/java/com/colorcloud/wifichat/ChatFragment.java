@@ -5,6 +5,7 @@ import android.app.ListFragment;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,7 @@ import java.util.List;
  * chat fragment attached to main activity.
  */
 public class ChatFragment extends ListFragment {
-//    private static final String TAG = "PTP_ChatFrag";
+    private static final String TAG = "ChatFragment";
 
     private static ChatActivity mActivity = null;
 
@@ -90,9 +91,14 @@ public class ChatFragment extends ListFragment {
                     MessageRow messageRow = new MessageRow(mMyDeviceName, inputMsg, null);
                     MessageWrapper messageWrapper = new MessageWrapper(Constant.MESSAGE, messageRow.toString());
                     appendChatMessage(messageRow);
-                    String formattedMsg = messageWrapper.toString();
+                    final String formattedMsg = messageWrapper.toString();
 
-                    ChatActivity.pushOutMessage(formattedMsg);
+                    if (WiFiDirectActivity.multihopState == false) {
+                        ChatActivity.pushOutMessage(formattedMsg);
+                    } else {
+                        Log.d(TAG, "multi-hop flow");
+                        RoutingManager.getInstance().connectionTest(formattedMsg);
+                    }
                 } else
                     Toast.makeText(getActivity(), "Please input text", Toast.LENGTH_SHORT).show();
             }

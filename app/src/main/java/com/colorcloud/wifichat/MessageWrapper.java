@@ -35,7 +35,6 @@ public class MessageWrapper {
             Checksum checksum = new CRC32();
             checksum.update(bytes, 0, bytes.length);
             this.ack = checksum.getValue();
-            Log.d(TAG, "the ACK constructed is:  " + ack);
             // TODO: 6/2/16 when a MESSAGE is constructed, it should be enqueued in the message queue for ACK
         } else {
             this.ack = 0;
@@ -60,7 +59,6 @@ public class MessageWrapper {
 
     public static MessageWrapper parseMessageWrapper(String string) {
         int parsingProgress = 0; // parsing has 3 stages 1,2,3
-        Log.d(TAG, "string to parse is: " + string);
         StringTokenizer stringTokenizer = new StringTokenizer(string, MESSAGE_WRAPPER_TOKEN);
         MessageWrapper messageWrapper = new MessageWrapper();
 
