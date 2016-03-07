@@ -25,7 +25,6 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -151,7 +150,7 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
      */
     public void updateThisDevice(WifiP2pDevice device) { // callback of this device details changed bcast event.
         this.device = device;
-        WiFiDirectActivity.mydevice = device;
+        WiFiDirectActivity.myDevice = device;
         WiFiDirectActivity.partnerDevice = device.deviceAddress.equalsIgnoreCase("8a:c9:d0:ea:de:f2") ? "ee:88:92:7a:ed:c0" : "8a:c9:d0:ea:de:f2";
         TextView view = (TextView) mContentView.findViewById(R.id.my_name);
         view.setText(device.deviceName);

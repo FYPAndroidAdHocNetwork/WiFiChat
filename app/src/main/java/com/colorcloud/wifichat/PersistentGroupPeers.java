@@ -50,12 +50,6 @@ public class PersistentGroupPeers {
         persistentGroupPeers.clear();
     }
 
-    public boolean isMessagingAllowed() {
-        // messaging will only be meaningful when there are at least 2 members in the group, 1 owner and 1 client
-        return persistentGroupPeers.size() > 1 ? true : false;
-    }
-
-
     @Override
     public String toString() {
         String formattedString = "";

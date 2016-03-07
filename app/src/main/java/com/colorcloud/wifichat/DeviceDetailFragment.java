@@ -187,6 +187,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 
         // InetAddress from WifiP2pInfo struct.
         view = (TextView) mContentView.findViewById(R.id.device_info);
+        // TODO: 7/3/16 below NullPointerException
         view.setText("Group Owner IP - " + info.groupOwnerAddress.getHostAddress());
 
         // After the group negotiation, we assign the group owner as the file
