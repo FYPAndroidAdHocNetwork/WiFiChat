@@ -23,8 +23,7 @@ import static com.colorcloud.wifichat.Constant.MSG_REGISTER_ACTIVITY;
 public class ChatActivity extends Activity {
 
     public static final String TAG = "ChatActivity";
-
-    ChatFragment mChatFrag = null;
+    ChatFragment chatFrag = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,14 +46,14 @@ public class ChatActivity extends Activity {
         try {
             // to add fragments to your activity layout, just specify which viewgroup to place the fragment.
             final FragmentTransaction ft = getFragmentManager().beginTransaction();
-            if (mChatFrag == null) {
-                //mChatFrag = ChatFragment.newInstance(this, ConnectionService.getInstance().mConnMan.mServerAddr);
-                mChatFrag = ChatFragment.newInstance(this, null, initMsg);
+            if (chatFrag == null) {
+                //chatFrag = ChatFragment.newInstance(this, ConnectionService.getInstance().connectionManager.serverAddr);
+                chatFrag = ChatFragment.newInstance(this, null, initMsg);
             }
 
 //            Log.d(TAG, "initFragment : show chat fragment..." + initMsg);
             // chat fragment on top, do not do replace, as frag_detail already hard coded in layout.
-            ft.add(R.id.frag_chat, mChatFrag, "chat_frag");
+            ft.add(R.id.frag_chat, chatFrag, "chat_frag");
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
             ft.commit();
         } catch (Exception e) {
@@ -161,7 +160,7 @@ public class ChatActivity extends Activity {
     /**
      * register this activity to service process, so that service later can update list view.
      * In AsyncTask, the activity itself is passed to the constructor of asyncTask, hence later
-     * onPostExecute() can do mActivity.mCommentsAdapter.notifyDataSetChanged();
+     * onPostExecute() can do chatActivity.mCommentsAdapter.notifyDataSetChanged();
      * Just need to be careful of reference to avoid mem leak.
      */
     protected void registerActivityToService(boolean register) {
@@ -196,8 +195,8 @@ public class ChatActivity extends Activity {
         try {
             MessageRow row = MessageRow.parseMsgRow(msg);
 //            Log.d(TAG, "showMessage : " + msg + " : " + row.mMsg);
-            if (mChatFrag != null) {
-                mChatFrag.appendChatMessage(row);
+            if (chatFrag != null) {
+                chatFrag.appendChatMessage(row);
             }
         } catch (Exception e) {
             Toast.makeText(this, "Show Msg Failed", Toast.LENGTH_SHORT).show();

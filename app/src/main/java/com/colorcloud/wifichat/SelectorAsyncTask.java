@@ -27,14 +27,14 @@ import static com.colorcloud.wifichat.Constant.MSG_SELECT_ERROR;
  */
 
 public class SelectorAsyncTask extends AsyncTask<Void, Void, Void> {
-//    private static final String TAG = "PTP_SEL";
+    private static final String TAG = "SelectorAsyncTask";
 
-    private ConnectionService mConnService;
-    private Selector mSelector;
+    private ConnectionService connService;
+    private Selector selector;
 
     public SelectorAsyncTask(ConnectionService connservice, Selector selector) {
-        mConnService = connservice;
-        mSelector = selector;
+        connService = connservice;
+        this.selector = selector;
     }
 
     @Override
@@ -47,26 +47,24 @@ public class SelectorAsyncTask extends AsyncTask<Void, Void, Void> {
         // Wait for events looper
         while (true) {
             try {
-//                Log.d(TAG, "select : selector monitoring: ");
-                mSelector.select();   // blocked on waiting for event
+                selector.select();   // blocked on waiting for event
 
 //                Log.d(TAG, "select : selector evented out: ");
                 // Get list of selection keys with pending events, and process it.
-                Iterator<SelectionKey> keys = mSelector.selectedKeys().iterator();
+                Iterator<SelectionKey> keys = selector.selectedKeys().iterator();
                 while (keys.hasNext()) {
                     // Get the selection key, and remove it from the list to indicate that it's being processed
                     SelectionKey selKey = keys.next();
                     keys.remove();
 //                    Log.d(TAG, "select : selectionkey: " + selKey.attachment());
-
                     try {
-                        processSelectionKey(mSelector, selKey);  // process the selection key.
+                        processSelectionKey(selector, selKey);  // process the selection key.
                     } catch (IOException e) {
                         selKey.cancel();
                         Log.e("SelectorAsyncTask", "select : io exception in processing selector event: " + e.toString());
                     }
                 }
-            } catch (Exception e) {  // catch all exception in select() and the following ops in mSelector.
+            } catch (Exception e) {  // catch all exception in select() and the following ops in selector.
                 Log.e("SelectorAsyncTask", "Exception in selector: " + e.toString());
                 notifyConnectionService(MSG_SELECT_ERROR, null, null);
                 break;
@@ -164,7 +162,7 @@ public class SelectorAsyncTask extends AsyncTask<Void, Void, Void> {
      * notify connection manager event
      */
     private void notifyConnectionService(int what, Object obj, Bundle data) {
-        Handler hdl = mConnService.getHandler();
+        Handler hdl = connService.getHandler();
         Message msg = hdl.obtainMessage();
         msg.what = what;
 
@@ -176,5 +174,4 @@ public class SelectorAsyncTask extends AsyncTask<Void, Void, Void> {
         }
         hdl.sendMessage(msg);
     }
-
 }

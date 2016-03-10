@@ -21,14 +21,12 @@ import static com.colorcloud.wifichat.Constant.*;
 public class ConnectionService extends Service {
 
     private static final String TAG = "ConnectionService";
+    private static ConnectionService instance = null;
+    private WorkHandler workHandler;
+    private MessageHandler messageHandler;
 
-    private static ConnectionService _sinstance = null;
-
-    private WorkHandler mWorkHandler;
-    private MessageHandler mHandler;
-
-    ChatActivity mActivity;    // shall I use weak reference here ?
-    ConnectionManager mConnMan;
+    ChatActivity chatActivity;    // shall I use weak reference here ?
+    ConnectionManager connectionManager;
 
     /**
      * @see android.app.Service#onCreate()
@@ -40,16 +38,16 @@ public class ConnectionService extends Service {
     }
 
     private void _initialize() {
-        if (_sinstance != null) {
+        if (instance != null) {
 //            Log.d(TAG, "_initialize, already initialized, do nothing.");
             return;
         }
 
-        _sinstance = this;
-        mWorkHandler = new WorkHandler("ConnectionService");
-        mHandler = new MessageHandler(mWorkHandler.getLooper());
+        instance = this;
+        workHandler = new WorkHandler("ConnectionService");
+        messageHandler = new MessageHandler(workHandler.getLooper());
 
-        mConnMan = new ConnectionManager(this);
+        connectionManager = new ConnectionManager(this);
     }
 
     @Override
@@ -59,7 +57,7 @@ public class ConnectionService extends Service {
     }
 
     public static ConnectionService getInstance() {
-        return _sinstance;
+        return instance;
     }
 
     @Override
@@ -72,7 +70,7 @@ public class ConnectionService extends Service {
     }
 
     public Handler getHandler() {
-        return mHandler;
+        return messageHandler;
     }
 
     /**
@@ -102,16 +100,16 @@ public class ConnectionService extends Service {
                 onActivityRegister((ChatActivity) msg.obj, msg.arg1);
                 break;
             case MSG_STARTSERVER:
-                mConnMan.startServerSelector();
+                connectionManager.startServerSelector();
                 break;
             case MSG_STARTCLIENT:
-                mConnMan.startClientSelector((String) msg.obj);
+                connectionManager.startClientSelector((String) msg.obj);
                 break;
             case MSG_NEW_CLIENT:
-                mConnMan.onNewClient((SocketChannel) msg.obj);
+                connectionManager.onNewClient((SocketChannel) msg.obj);
                 break;
             case MSG_FINISH_CONNECT:
-                mConnMan.onFinishConnect((SocketChannel) msg.obj);
+                connectionManager.onFinishConnect((SocketChannel) msg.obj);
                 break;
             // msg coming in
             case MSG_PULLIN_DATA:
@@ -121,10 +119,10 @@ public class ConnectionService extends Service {
                 onPushOutData((String) msg.obj);
                 break;
             case MSG_SELECT_ERROR:
-                mConnMan.onSelectorError();
+                connectionManager.onSelectorError();
                 break;
             case MSG_BROKEN_CONN:
-                mConnMan.onBrokenConn((SocketChannel) msg.obj);
+                connectionManager.onBrokenConn((SocketChannel) msg.obj);
                 break;
             default:
                 break;
@@ -137,9 +135,9 @@ public class ConnectionService extends Service {
     private void onActivityRegister(ChatActivity activity, int register) {
 //    	Log.d(TAG, "onActivityRegister : activity register itself to service : " + register);
         if (register == 1) {
-            mActivity = activity;
+            chatActivity = activity;
         } else {
-            mActivity = null;    // set to null explicitly to avoid mem leak.
+            chatActivity = null;    // set to null explicitly to avoid mem leak.
         }
     }
 
@@ -180,7 +178,7 @@ public class ConnectionService extends Service {
                 ChatActivity.pushOutMessage(repliedMessage.toString());
 
                 // pub to all client if this device is server.
-                mConnMan.onDataIn(schannel, data);
+                connectionManager.onDataIn(schannel, data);
 
                 // uncomment below line will enable the App to issue push notification upon receiving messages
                 //showNotification(data);
@@ -209,7 +207,7 @@ public class ConnectionService extends Service {
      * If the sender is client, only can send to the server.
      */
     private void onPushOutData(String data) {
-        mConnMan.pushOutData(data);
+        connectionManager.pushOutData(data);
     }
 
     /**
@@ -217,9 +215,9 @@ public class ConnectionService extends Service {
      */
     public int connectionSendData(String jsonstring) {
 //    	Log.d(TAG, "connectionSendData : " + jsonstring);
-        new SendDataAsyncTask(mConnMan, jsonstring).execute();
+        new SendDataAsyncTask(connectionManager, jsonstring).execute();
         return 0;
-        //return mConnMan.clientSendData(jsonstring);
+        //return connectionManager.clientSendData(jsonstring);
     }
 
     /**
@@ -250,11 +248,11 @@ public class ConnectionService extends Service {
      */
     private void showInActivity(final String msg) {
 //    	Log.d(TAG, "showInActivity : " + msg);
-        if (mActivity != null) {
-            mActivity.runOnUiThread(new Runnable() {
+        if (chatActivity != null) {
+            chatActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mActivity.showMessage(msg);
+                    chatActivity.showMessage(msg);
                 }
             });
         } else {
