@@ -1,7 +1,5 @@
 package com.colorcloud.wifichat;
 
-import android.util.Log;
-
 import java.util.StringTokenizer;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;

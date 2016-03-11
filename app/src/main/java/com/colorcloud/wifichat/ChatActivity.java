@@ -40,7 +40,7 @@ public class ChatActivity extends Activity {
     }
 
     /**
-     * init fragement with possible recvd start up message.
+     * init fragment with possible recvd start up message.
      */
     public void initFragment(String initMsg) {
         try {
@@ -65,7 +65,6 @@ public class ChatActivity extends Activity {
     public void onResume() {
         try {
             super.onResume();
-//            Log.d(TAG, "onResume: chat activity resume, register activity to connection service !");
             registerActivityToService(true);
         } catch (Exception e) {
             Toast.makeText(this, "On Resume Failed", Toast.LENGTH_SHORT).show();
@@ -76,7 +75,6 @@ public class ChatActivity extends Activity {
     public void onPause() {
         try {
             super.onPause();
-//            Log.d(TAG, "onPause: chat activity closed, de-register activity from connection service !");
             registerActivityToService(false);
         } catch (Exception e) {
             Toast.makeText(this, "On Pause Failed", Toast.LENGTH_SHORT).show();
@@ -87,7 +85,6 @@ public class ChatActivity extends Activity {
     public void onDestroy() {
         try {
             super.onDestroy();
-//            Log.d(TAG, " onDestroy: disconnect p2p connection. ");
         } catch (Exception e) {
             Toast.makeText(this, "On Destroy Failed", Toast.LENGTH_SHORT).show();
         }

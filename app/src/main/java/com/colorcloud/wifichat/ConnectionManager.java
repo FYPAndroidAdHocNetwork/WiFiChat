@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * this class encapsulate the NIO buffer and NIO channel on top of socket. It is all abt NIO style.
+ * this class encapsulates the NIO buffer and NIO channel on top of socket. It is all abt NIO style.
  * SSLServerSocketChannel, ServerSocketChannel, SocketChannel, Selector, ByteBuffer, etc.
  * NIO buffer (ByteBuffer) either in writing mode or in reading mode. Need to flip the mode before reading or writing.
  * <p/>
