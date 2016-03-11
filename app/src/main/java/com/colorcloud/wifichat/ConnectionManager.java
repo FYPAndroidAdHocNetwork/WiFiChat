@@ -22,7 +22,9 @@ import java.util.Map;
  */
 public class ConnectionManager {
 
-    private final String TAG = "ConnectionManager";
+    private static final String TAG = "ConnectionManager";
+
+    private static final int PORT_NUMBER = 1080;
 
     ConnectionService connectionService;
     // Server knows all clients. key is ip addr, value is socket channel.
@@ -44,12 +46,6 @@ public class ConnectionManager {
         connectionService = service;
     }
 
-    public void configIPV4() {
-        // by default Selector attempts to work on IPv6 stack.
-        java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
-        java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
-    }
-
     /**
      * create a server socket channel to listen to the port for incoming connections.
      */
@@ -58,6 +54,7 @@ public class ConnectionManager {
         ServerSocketChannel ssChannel = ServerSocketChannel.open();
         ssChannel.configureBlocking(false);
         ServerSocket serverSocket = ssChannel.socket();
+        serverSocket.setReuseAddress(true);
         serverSocket.bind(new InetSocketAddress(port));  // bind to the port to listen.
         return ssChannel;
     }
@@ -70,7 +67,6 @@ public class ConnectionManager {
         // Create a non-blocking socket channel
         SocketChannel sChannel = SocketChannel.open();
         sChannel.configureBlocking(false);
-
         // Send a connection request to the server; this method is non-blocking
         sChannel.connect(new InetSocketAddress(hostName, port));
         return sChannel;
@@ -81,22 +77,18 @@ public class ConnectionManager {
      * after return, the socket channel guarantee to be connected.
      */
     public SocketChannel connectTo(String hostname, int port) {
-        SocketChannel sChannel = null;
+        SocketChannel sChannel;
         try {
             sChannel = createSocketChannel(hostname, port);  // connect to the remote host, port
-
             // Before the socket is usable, the connection must be completed. finishConnect().
             while (!sChannel.finishConnect()) {
                 // blocking spin lock
             }
             // Socket channel is now ready to use
         } catch (IOException e) {
-            Log.e("ConnectionManager", "connectTo: exception : " + e.toString());
-            //Toast.makeText(this.mContext, "connectTo: exception : ",  Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "connectTo: exception : " + e.toString());
             return null;
         }
-//        Log.d(TAG, "connectTo: finishConnect : ");
-        //Toast.makeText(this.mContext,"connectTo: finishConnect : ",  Toast.LENGTH_SHORT).show();
         return sChannel;
     }
 
@@ -108,15 +100,15 @@ public class ConnectionManager {
         closeServer();   // close linger server.
 
         if (clientSocketChannel != null) {
-//            Log.d(TAG, "startClientSelector : client already connected to server: " + clientSocketChannel.socket().getLocalAddress().getHostAddress());
-            //Toast.makeText(this.mContext, "startClientSelector : client already connected to server: " + clientSocketChannel.socket().getLocalAddress().getHostAddress(),  Toast.LENGTH_SHORT).show();
-            return -1;
+            Log.d(TAG, "startClientSelector: client already connected to server: " + clientSocketChannel.socket().getLocalAddress().getHostAddress());
+            return 0;
         }
 
         try {
             // connected to the server upon start client.
-            SocketChannel sChannel = connectTo(host, 1080);
+            SocketChannel sChannel = connectTo(host, PORT_NUMBER);
             if (sChannel == null) {
+                Log.e(TAG, "failed to connect to server");
                 return -1;
             }
 
@@ -125,13 +117,10 @@ public class ConnectionManager {
             clientAddr = clientSocketChannel.socket().getLocalAddress().getHostName();
             sChannel.register(selector, SelectionKey.OP_READ);
             ((WiFiChatApp) connectionService.getApplication()).setMyAddr(clientAddr);
-//            Log.d(TAG, "startClientSelector : started: " + clientSocketChannel.socket().getLocalAddress().getHostAddress());
-
-            //Toast.makeText(this.mContext,"startClientSelector : started: " + clientSocketChannel.socket().getLocalAddress().getHostAddress(),  Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "startClientSelector: started: " + clientSocketChannel.socket().getLocalAddress().getHostAddress());
         } catch (Exception e) {
-            Log.e("ConnectionManager", "startClientSelector : exception: ");
+            Log.e(TAG, "startClientSelector exception: " + e.toString());
 
-            //Toast.makeText(this.mContext,"startClientSelector : exception: ",  Toast.LENGTH_SHORT).show();
             selector = null;
             clientSocketChannel = null;
             return -1;
@@ -151,7 +140,7 @@ public class ConnectionManager {
 
         try {
             // create server socket and register to selector to listen OP_ACCEPT event
-            ServerSocketChannel sServerChannel = createServerSocketChannel(1080); // BindException if already bind.
+            ServerSocketChannel sServerChannel = createServerSocketChannel(PORT_NUMBER); // BindException if already bind.
             serverSocketChannel = sServerChannel;
             serverAddr = serverSocketChannel.socket().getInetAddress().getHostAddress();
             if ("0.0.0.0".equals(serverAddr)) {
@@ -171,7 +160,6 @@ public class ConnectionManager {
         } catch (Exception e) {
             // TODO: 1/3/16 how to solve this exception?
             Log.e(TAG, "startServerSelector exception: " + e.toString());
-            //Toast.makeText(this.mContext,"startServerSelector : exception: ",  Toast.LENGTH_SHORT).show();
             return -1;
         }
 
@@ -184,8 +172,6 @@ public class ConnectionManager {
      */
     public void onSelectorError() {
         Log.e("ConnectionManager", " onSelectorError : do nothing for now.");
-        //Toast.makeText(this.mContext," onSelectorError : do nothing for now.",  Toast.LENGTH_SHORT).show();
-        // new SelectorAsyncTask(connectionService, selector).execute();
     }
 
     /**
@@ -198,7 +184,7 @@ public class ConnectionManager {
                 serverSocketChannel.close();
                 selector.close();
             } catch (Exception e) {
-
+                Log.e(TAG, "closeServer exception: " + e.toString());
             } finally {
                 isServer = false;
                 serverSocketChannel = null;
@@ -215,7 +201,7 @@ public class ConnectionManager {
                 clientSocketChannel.close();
                 selector.close();
             } catch (Exception e) {
-
+                Log.e(TAG, "closeClient exception: " + e.toString());
             } finally {
                 clientSocketChannel = null;
                 selector = null;
@@ -227,8 +213,8 @@ public class ConnectionManager {
     /**
      * read out -1, connection broken, remove it from clients collection
      */
-    public void onBrokenConn(SocketChannel schannel) {
-        String peeraddr = schannel.socket().getInetAddress().getHostAddress();
+    public void onBrokenConn(SocketChannel socketChannel) {
+        String peeraddr = socketChannel.socket().getInetAddress().getHostAddress();
         if (isServer) {
             clientChannels.remove(peeraddr);
 //            Log.d(TAG, "onBrokenConn : client down: " + peeraddr);
@@ -243,22 +229,22 @@ public class ConnectionManager {
     /**
      * Server handle new client coming in.
      */
-    public void onNewClient(SocketChannel schannel) {
-        String ipaddr = schannel.socket().getInetAddress().getHostAddress();
+    public void onNewClient(SocketChannel socketChannel) {
+        String ipaddr = socketChannel.socket().getInetAddress().getHostAddress();
 //        Log.d(TAG, "onNewClient : server added remote client: " + ipaddr);
         //Toast.makeText(this.mContext,"onNewClient : server added remote client: " + ipaddr,  Toast.LENGTH_SHORT).show();
-        clientChannels.put(ipaddr, schannel);
+        clientChannels.put(ipaddr, socketChannel);
     }
 
     /**
      * Client's connect to server success,
      */
-    public void onFinishConnect(SocketChannel schannel) {
-        String clientaddr = schannel.socket().getLocalAddress().getHostAddress();
-        String serveraddr = schannel.socket().getInetAddress().getHostAddress();
+    public void onFinishConnect(SocketChannel socketChannel) {
+        String clientaddr = socketChannel.socket().getLocalAddress().getHostAddress();
+        String serveraddr = socketChannel.socket().getInetAddress().getHostAddress();
 //        Log.d(TAG, "onFinishConnect : client connect to server succeed : " + clientaddr + " -> " + serveraddr);
         //Toast.makeText(this.mContext,"onFinishConnect : client connect to server succeed : " + clientaddr + " -> " + serveraddr,  Toast.LENGTH_SHORT).show();
-        clientSocketChannel = schannel;
+        clientSocketChannel = socketChannel;
         clientAddr = clientaddr;
         ((WiFiChatApp) connectionService.getApplication()).setMyAddr(clientAddr);
     }
@@ -266,10 +252,10 @@ public class ConnectionManager {
     /**
      * client send data into server, server pub to all clients.
      */
-    public void onDataIn(SocketChannel schannel, String data) {
+    public void onDataIn(SocketChannel socketChannel, String data) {
         // push all other clients if the device is the server
         if (isServer) {
-            pubDataToAllClients(data, schannel);
+            pubDataToAllClients(data, socketChannel);
         }
     }
 
@@ -287,7 +273,7 @@ public class ConnectionManager {
             nwritten = sChannel.write(bytebuf);
         } catch (Exception e) {
             // Connection may have been closed
-            Log.e("ConnectionManager", "writeData: exception : " + e.toString());
+            Log.e(TAG, "writeData: exception : " + e.toString());
             //Toast.makeText(this.mContext,"writeData: exception : ",  Toast.LENGTH_SHORT).show();
             onBrokenConn(sChannel);
         }
@@ -300,24 +286,17 @@ public class ConnectionManager {
      * server publish data to all the connected clients
      */
     private void pubDataToAllClients(String msg, SocketChannel incomingChannel) {
-//        Log.d(TAG, "pubDataToAllClients : isServer ? " + isServer + " msg: " + msg);
-        //Toast.makeText(this.mContext,"pubDataToAllClients : isServer ? " + isServer + " msg: " + msg ,  Toast.LENGTH_SHORT).show();
         if (!isServer) {
-//            Log.d(TAG, "pubDataToAllClients : not server");
             return;
         }
 
         for (SocketChannel s : clientChannels.values()) {
             if (s != incomingChannel) {
-                String peeraddr = s.socket().getInetAddress().getHostAddress();
-//                Log.d(TAG, "pubDataToAllClients : Server pub data to:  " + peeraddr);
-                //Toast.makeText(this.mContext,"pubDataToAllClients : Server pub data to:  " + peeraddr,  Toast.LENGTH_SHORT).show();
+                String peerAddr = s.socket().getInetAddress().getHostAddress();
+                Log.d(TAG, "Server pub data to:  " + peerAddr);
                 writeData(s, msg);
             }
-            String peeraddr = s.socket().getInetAddress().getHostAddress();
-//            Log.d(TAG, "pubDataToAllClients : Server pub data to:  " + peeraddr);
         }
-//        Log.d(TAG, "pubDataToAllClients : end s : " + clientChannels.values().size());
     }
 
     /**
@@ -340,7 +319,7 @@ public class ConnectionManager {
      */
     private int sendDataToServer(String jsonString) {
         if (clientSocketChannel == null) {
-//            Log.d(TAG, "sendDataToServer: channel not connected ! waiting...");
+            Log.d(TAG, "sendDataToServer: channel not connected ! waiting...");
             //Toast.makeText(this.mContext,"sendDataToServer: channel not connected ! waiting...",  Toast.LENGTH_SHORT).show();
             return 0;
         }
