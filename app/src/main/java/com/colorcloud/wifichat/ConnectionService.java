@@ -178,7 +178,7 @@ public class ConnectionService extends Service {
                 ChatActivity.pushOutMessage(repliedMessage.toString());
 
                 // pub to all client if this device is server.
-                connectionManager.onDataIn(schannel, data);
+                connectionManager.pubDataToAllClients(data, schannel);
 
                 // uncomment below line will enable the App to issue push notification upon receiving messages
                 //showNotification(data);

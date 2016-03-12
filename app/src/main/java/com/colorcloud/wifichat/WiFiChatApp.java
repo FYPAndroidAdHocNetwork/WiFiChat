@@ -41,8 +41,7 @@ public class WiFiChatApp extends Application {
         msg.obj = hostname;
         ConnectionService.getInstance().getHandler().sendMessage(msg);
     }
-
-
+    
     public void setMyAddr(String addr) {
         mMyAddr = addr;
     }

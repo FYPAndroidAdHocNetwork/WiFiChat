@@ -14,11 +14,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
-import static com.colorcloud.wifichat.Constant.MSG_BROKEN_CONN;
-import static com.colorcloud.wifichat.Constant.MSG_FINISH_CONNECT;
-import static com.colorcloud.wifichat.Constant.MSG_NEW_CLIENT;
-import static com.colorcloud.wifichat.Constant.MSG_PULLIN_DATA;
-import static com.colorcloud.wifichat.Constant.MSG_SELECT_ERROR;
+import static com.colorcloud.wifichat.Constant.*;
 
 /**
  * the selector only monitors OP_CONNECT and OP_READ. Do not monitor OP_WRITE as a channel is always writable.
@@ -75,6 +71,7 @@ public class SelectorAsyncTask extends AsyncTask<Void, Void, Void> {
     /**
      * process the event popped to the selector
      */
+    // TODO: understand what happens here
     public void processSelectionKey(Selector selector, SelectionKey selKey) throws IOException {
         if (selKey.isValid() && selKey.isAcceptable()) {  // there is a connection to the server socket channel
             ServerSocketChannel ssChannel = (ServerSocketChannel) selKey.channel();
@@ -89,8 +86,7 @@ public class SelectorAsyncTask extends AsyncTask<Void, Void, Void> {
         } else if (selKey.isValid() && selKey.isConnectable()) {   // client connect to server got the response.
             SocketChannel sChannel = (SocketChannel) selKey.channel();
 
-            boolean success = sChannel.finishConnect();
-            if (!success) {
+            if (!sChannel.finishConnect()) {
                 // An error occurred; unregister the channel.
                 selKey.cancel();
                 Log.e("SelectorAsyncTask", " processSelectionKey : finish connection not success !");

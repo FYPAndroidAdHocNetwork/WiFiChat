@@ -17,7 +17,7 @@ import java.util.Map;
  * this class encapsulates the NIO buffer and NIO channel on top of socket. It is all abt NIO style.
  * SSLServerSocketChannel, ServerSocketChannel, SocketChannel, Selector, ByteBuffer, etc.
  * NIO buffer (ByteBuffer) either in writing mode or in reading mode. Need to flip the mode before reading or writing.
- * <p>
+ * <p/>
  * You know when a socket channel disconnected when you read -1 or write exception. You need app level ACK.
  */
 public class ConnectionManager {
@@ -113,7 +113,7 @@ public class ConnectionManager {
 
             selector = Selector.open();
             clientAddr = clientSocketChannel.socket().getLocalAddress().getHostName();
-            clientSocketChannel.register(selector, SelectionKey.OP_READ);
+            clientSocketChannel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
             ((WiFiChatApp) connectionService.getApplication()).setMyAddr(clientAddr);
             Log.d(TAG, "Client Selector started; client addr: " + clientSocketChannel.socket().getLocalAddress().getHostAddress());
         } catch (Exception e) {
@@ -148,19 +148,14 @@ public class ConnectionManager {
             if ("0.0.0.0".equals(serverAddr)) {
                 serverAddr = "Header";
             }
+            Log.d(TAG, "server addr: " + serverAddr);
             ((WiFiChatApp) connectionService.getApplication()).setMyAddr(serverAddr);
 
             selector = Selector.open();
             SelectionKey acceptKey = serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
             acceptKey.attach("accept_channel");
             isServer = true;
-
-            //SocketChannel sChannel = createSocketChannel("hostname.com", 80);
-            //sChannel.register(selector, SelectionKey.OP_CONNECT);  // listen to connect event.
-//            Log.d(TAG, "startServerSelector : started: " + sServerChannel.socket().getLocalSocketAddress().toString());
-            //Toast.makeText(this.mContext,"startServerSelector : started: " + sServerChannel.socket().getLocalSocketAddress().toString(),  Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
-            // TODO: 1/3/16 how to solve this exception?
             Log.e(TAG, "startServerSelector exception: " + e.toString());
             return -1;
         }
@@ -216,14 +211,11 @@ public class ConnectionManager {
      * read out -1, connection broken, remove it from clients collection
      */
     public void onBrokenConn(SocketChannel socketChannel) {
-        String peeraddr = socketChannel.socket().getInetAddress().getHostAddress();
+        //todo why this method keeps being called when connection breaks?
+        String peerAddr = socketChannel.socket().getInetAddress().getHostAddress();
         if (isServer) {
-            clientChannels.remove(peeraddr);
-//            Log.d(TAG, "onBrokenConn : client down: " + peeraddr);
-            //Toast.makeText(this.mContext,"onBrokenConn : client down: " + peeraddr,  Toast.LENGTH_SHORT).show();
+            clientChannels.remove(peerAddr);
         } else {
-//            Log.d(TAG, "onBrokenConn : set null client channel after server down: " + peeraddr);
-            //Toast.makeText(this.mContext,"onBrokenConn : set null client channel after server down: " + peeraddr,  Toast.LENGTH_SHORT).show();
             clientSocketChannel = null;
         }
     }
@@ -232,62 +224,45 @@ public class ConnectionManager {
      * Server handle new client coming in.
      */
     public void onNewClient(SocketChannel socketChannel) {
-        String ipaddr = socketChannel.socket().getInetAddress().getHostAddress();
-//        Log.d(TAG, "onNewClient : server added remote client: " + ipaddr);
-        //Toast.makeText(this.mContext,"onNewClient : server added remote client: " + ipaddr,  Toast.LENGTH_SHORT).show();
-        clientChannels.put(ipaddr, socketChannel);
+        String clientAddr = socketChannel.socket().getInetAddress().getHostAddress();
+        Log.d(TAG, "onNewClient: " + clientAddr);
+        clientChannels.put(clientAddr, socketChannel);
     }
 
     /**
      * Client's connect to server success,
      */
     public void onFinishConnect(SocketChannel socketChannel) {
-        String clientaddr = socketChannel.socket().getLocalAddress().getHostAddress();
-        String serveraddr = socketChannel.socket().getInetAddress().getHostAddress();
-//        Log.d(TAG, "onFinishConnect : client connect to server succeed : " + clientaddr + " -> " + serveraddr);
-        //Toast.makeText(this.mContext,"onFinishConnect : client connect to server succeed : " + clientaddr + " -> " + serveraddr,  Toast.LENGTH_SHORT).show();
+        String clientAddr = socketChannel.socket().getLocalAddress().getHostAddress();
+        String serverAddr = socketChannel.socket().getInetAddress().getHostAddress();
+        Log.d(TAG, "onFinishConnect: " + clientAddr + " -> " + serverAddr);
         clientSocketChannel = socketChannel;
-        clientAddr = clientaddr;
-        ((WiFiChatApp) connectionService.getApplication()).setMyAddr(clientAddr);
-    }
-
-    /**
-     * client send data into server, server pub to all clients.
-     */
-    public void onDataIn(SocketChannel socketChannel, String data) {
-        // push all other clients if the device is the server
-        if (isServer) {
-            pubDataToAllClients(data, socketChannel);
-        }
+        this.clientAddr = clientAddr;
+        ((WiFiChatApp) connectionService.getApplication()).setMyAddr(this.clientAddr);
     }
 
     /**
      * write byte buf to the socket channel.
      */
-    private int writeData(SocketChannel sChannel, String jsonString) {
+    private int writeData(SocketChannel socketChannel, String jsonString) {
         byte[] buf = jsonString.getBytes();
-        ByteBuffer bytebuf = ByteBuffer.wrap(buf);  // wrap the buf into byte buffer
-        int nwritten = 0;
+        ByteBuffer byteBuffer = ByteBuffer.wrap(buf);  // wrap the buf into byte buffer
+        int numOfBytesWritten = 0;
         try {
-            //bytebuf.flip();  // no flip after creating from wrap.
-//            Log.d(TAG, "writeData: start:limit = " + bytebuf.position() + " : " + bytebuf.limit());
-            //Toast.makeText(this.mContext,"writeData: start:limit = " + bytebuf.position() + " : " + bytebuf.limit(),  Toast.LENGTH_SHORT).show();
-            nwritten = sChannel.write(bytebuf);
+            //byteBuffer.flip();  // no flip after creating from wrap.
+            numOfBytesWritten = socketChannel.write(byteBuffer);
         } catch (Exception e) {
             // Connection may have been closed
-            Log.e(TAG, "writeData: exception : " + e.toString());
-            //Toast.makeText(this.mContext,"writeData: exception : ",  Toast.LENGTH_SHORT).show();
-            onBrokenConn(sChannel);
+            Log.e(TAG, "writeData exception : " + e.toString());
+            onBrokenConn(socketChannel);
         }
-//        Log.d(TAG, "writeData: content: " + new String(buf) + "  : len: " + nwritten);
-        //Toast.makeText(this.mContext, "writeData: content: " + new String(buf) + "  : len: " + nwritten,  Toast.LENGTH_SHORT).show();
-        return nwritten;
+        return numOfBytesWritten;
     }
 
     /**
      * server publish data to all the connected clients
      */
-    private void pubDataToAllClients(String msg, SocketChannel incomingChannel) {
+    public void pubDataToAllClients(String msg, SocketChannel incomingChannel) {
         if (!isServer) {
             return;
         }
@@ -319,14 +294,11 @@ public class ConnectionManager {
     /**
      * whenever client write to server, carry the format of "client_addr : msg "
      */
-    private int sendDataToServer(String jsonString) {
+    private void sendDataToServer(String jsonString) {
         if (clientSocketChannel == null) {
-            Log.d(TAG, "sendDataToServer: channel not connected ! waiting...");
-            //Toast.makeText(this.mContext,"sendDataToServer: channel not connected ! waiting...",  Toast.LENGTH_SHORT).show();
-            return 0;
+            Log.e(TAG, "sendDataToServer: channel not connected ! waiting...");
+            return;
         }
-//        Log.d(TAG, "sendDataToServer: " + clientAddr + " -> " + clientSocketChannel.socket().getInetAddress().getHostAddress() + " : " + jsonString);
-        //Toast.makeText(this.mContext,"sendDataToServer: " + clientAddr + " -> " + clientSocketChannel.socket().getInetAddress().getHostAddress() + " : " +  jsonString,  Toast.LENGTH_SHORT).show();
-        return writeData(clientSocketChannel, jsonString);
+        writeData(clientSocketChannel, jsonString);
     }
 }
