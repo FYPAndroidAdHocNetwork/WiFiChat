@@ -17,13 +17,12 @@ import java.util.Map;
  * this class encapsulates the NIO buffer and NIO channel on top of socket. It is all abt NIO style.
  * SSLServerSocketChannel, ServerSocketChannel, SocketChannel, Selector, ByteBuffer, etc.
  * NIO buffer (ByteBuffer) either in writing mode or in reading mode. Need to flip the mode before reading or writing.
- * <p/>
+ * <p>
  * You know when a socket channel disconnected when you read -1 or write exception. You need app level ACK.
  */
 public class ConnectionManager {
 
     private static final String TAG = "ConnectionManager";
-
     private static final int PORT_NUMBER = 1080;
 
     ConnectionService connectionService;
@@ -51,12 +50,12 @@ public class ConnectionManager {
      */
     public static ServerSocketChannel createServerSocketChannel(int port) throws IOException {
         // Create a non-blocking socket channel
-        ServerSocketChannel ssChannel = ServerSocketChannel.open();
-        ssChannel.configureBlocking(false);
-        ServerSocket serverSocket = ssChannel.socket();
+        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
+        serverSocketChannel.configureBlocking(false);
+        ServerSocket serverSocket = serverSocketChannel.socket();
         serverSocket.setReuseAddress(true);
         serverSocket.bind(new InetSocketAddress(port));  // bind to the port to listen.
-        return ssChannel;
+        return serverSocketChannel;
     }
 
     /**
@@ -65,11 +64,11 @@ public class ConnectionManager {
      */
     public static SocketChannel createSocketChannel(String hostName, int port) throws IOException {
         // Create a non-blocking socket channel
-        SocketChannel sChannel = SocketChannel.open();
-        sChannel.configureBlocking(false);
+        SocketChannel socketChannel = SocketChannel.open();
+        socketChannel.configureBlocking(false);
         // Send a connection request to the server; this method is non-blocking
-        sChannel.connect(new InetSocketAddress(hostName, port));
-        return sChannel;
+        socketChannel.connect(new InetSocketAddress(hostName, port));
+        return socketChannel;
     }
 
     /**
@@ -77,11 +76,11 @@ public class ConnectionManager {
      * after return, the socket channel guarantee to be connected.
      */
     public SocketChannel connectTo(String hostname, int port) {
-        SocketChannel sChannel;
+        SocketChannel socketChannel;
         try {
-            sChannel = createSocketChannel(hostname, port);  // connect to the remote host, port
+            socketChannel = createSocketChannel(hostname, port);  // connect to the remote host, port
             // Before the socket is usable, the connection must be completed. finishConnect().
-            while (!sChannel.finishConnect()) {
+            while (!socketChannel.finishConnect()) {
                 // blocking spin lock
             }
             // Socket channel is now ready to use
@@ -89,7 +88,7 @@ public class ConnectionManager {
             Log.e(TAG, "connectTo: exception : " + e.toString());
             return null;
         }
-        return sChannel;
+        return socketChannel;
     }
 
     /**
@@ -100,27 +99,25 @@ public class ConnectionManager {
         closeServer();   // close linger server.
 
         if (clientSocketChannel != null) {
-            Log.d(TAG, "startClientSelector: client already connected to server: " + clientSocketChannel.socket().getLocalAddress().getHostAddress());
+            Log.d(TAG, "startClientSelector: already connected; client addr: " + clientSocketChannel.socket().getLocalAddress().getHostAddress());
             return 0;
         }
 
         try {
             // connected to the server upon start client.
-            SocketChannel sChannel = connectTo(host, PORT_NUMBER);
-            if (sChannel == null) {
+            clientSocketChannel = connectTo(host, PORT_NUMBER);
+            if (clientSocketChannel == null) {
                 Log.e(TAG, "failed to connect to server");
                 return -1;
             }
 
             selector = Selector.open();
-            clientSocketChannel = sChannel;
             clientAddr = clientSocketChannel.socket().getLocalAddress().getHostName();
-            sChannel.register(selector, SelectionKey.OP_READ);
+            clientSocketChannel.register(selector, SelectionKey.OP_READ);
             ((WiFiChatApp) connectionService.getApplication()).setMyAddr(clientAddr);
-            Log.d(TAG, "startClientSelector: started: " + clientSocketChannel.socket().getLocalAddress().getHostAddress());
+            Log.d(TAG, "Client Selector started; client addr: " + clientSocketChannel.socket().getLocalAddress().getHostAddress());
         } catch (Exception e) {
             Log.e(TAG, "startClientSelector exception: " + e.toString());
-
             selector = null;
             clientSocketChannel = null;
             return -1;
@@ -140,16 +137,21 @@ public class ConnectionManager {
 
         try {
             // create server socket and register to selector to listen OP_ACCEPT event
-            ServerSocketChannel sServerChannel = createServerSocketChannel(PORT_NUMBER); // BindException if already bind.
-            serverSocketChannel = sServerChannel;
-            serverAddr = serverSocketChannel.socket().getInetAddress().getHostAddress();
+            serverSocketChannel = createServerSocketChannel(PORT_NUMBER); // BindException if already bind.
+
+            if (serverSocketChannel == null) {
+                Log.e(TAG, "failed to createServerSocketChannel");
+                return -1;
+            }
+
+            serverAddr = this.serverSocketChannel.socket().getInetAddress().getHostAddress();
             if ("0.0.0.0".equals(serverAddr)) {
                 serverAddr = "Header";
             }
             ((WiFiChatApp) connectionService.getApplication()).setMyAddr(serverAddr);
 
             selector = Selector.open();
-            SelectionKey acceptKey = sServerChannel.register(selector, SelectionKey.OP_ACCEPT);
+            SelectionKey acceptKey = serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
             acceptKey.attach("accept_channel");
             isServer = true;
 
