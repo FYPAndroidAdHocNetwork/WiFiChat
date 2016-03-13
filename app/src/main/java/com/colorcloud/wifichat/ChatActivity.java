@@ -17,7 +17,6 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.colorcloud.wifichat.Constant.MSG_PUSHOUT_DATA;
 import static com.colorcloud.wifichat.Constant.MSG_REGISTER_ACTIVITY;
 
 public class ChatActivity extends Activity {
@@ -32,7 +31,6 @@ public class ChatActivity extends Activity {
             setContentView(R.layout.chat);
             Intent i = getIntent();
             String initMsg = i.getStringExtra("FIRST_MSG");
-
             initFragment(initMsg);
         } catch (Exception e) {
             Toast.makeText(this, "On Create Failed", Toast.LENGTH_SHORT).show();
@@ -47,16 +45,15 @@ public class ChatActivity extends Activity {
             // to add fragments to your activity layout, just specify which viewgroup to place the fragment.
             final FragmentTransaction ft = getFragmentManager().beginTransaction();
             if (chatFrag == null) {
-                //chatFrag = ChatFragment.newInstance(this, ConnectionService.getInstance().connectionManager.serverAddr);
                 chatFrag = ChatFragment.newInstance(this, null, initMsg);
             }
 
-//            Log.d(TAG, "initFragment : show chat fragment..." + initMsg);
             // chat fragment on top, do not do replace, as frag_detail already hard coded in layout.
             ft.add(R.id.frag_chat, chatFrag, "chat_frag");
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
             ft.commit();
         } catch (Exception e) {
+            Log.e(TAG, e.toString());
             Toast.makeText(this, "Init fragment Failed", Toast.LENGTH_SHORT).show();
         }
     }
@@ -67,6 +64,7 @@ public class ChatActivity extends Activity {
             super.onResume();
             registerActivityToService(true);
         } catch (Exception e) {
+            Log.e(TAG, e.toString());
             Toast.makeText(this, "On Resume Failed", Toast.LENGTH_SHORT).show();
         }
     }
@@ -77,7 +75,8 @@ public class ChatActivity extends Activity {
             super.onPause();
             registerActivityToService(false);
         } catch (Exception e) {
-            Toast.makeText(this, "On Pause Failed", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, e.toString());
+            Toast.makeText(this, "ChatActivity onPause Failed", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -86,7 +85,8 @@ public class ChatActivity extends Activity {
         try {
             super.onDestroy();
         } catch (Exception e) {
-            Toast.makeText(this, "On Destroy Failed", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, e.toString());
+            Toast.makeText(this, "ChatActivity onDestroy Failed", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -118,7 +118,6 @@ public class ChatActivity extends Activity {
      * Responsible for how to show data to list fragment list view.
      */
     final class ChatMessageAdapter extends ArrayAdapter<String> {
-
         private LayoutInflater mInflater;
 
         public ChatMessageAdapter(Context context, List<String> objects) {
@@ -170,19 +169,8 @@ public class ChatActivity extends Activity {
                 ConnectionService.getInstance().getHandler().sendMessage(msg);
             }
         } catch (Exception e) {
-            Toast.makeText(this, "Register Activity Failed", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, e.toString());
         }
-    }
-
-    /**
-     * post send msg to service to handle it in background.
-     */
-    public static void pushOutMessage(String formattedString) {
-        Log.d(TAG, "pushOutMessage : " + formattedString);
-        Message msg = ConnectionService.getInstance().getHandler().obtainMessage();
-        msg.what = MSG_PUSHOUT_DATA;
-        msg.obj = formattedString;
-        ConnectionService.getInstance().getHandler().sendMessage(msg);
     }
 
     /**
@@ -191,11 +179,11 @@ public class ChatActivity extends Activity {
     public void showMessage(String msg) {
         try {
             MessageRow row = MessageRow.parseMsgRow(msg);
-//            Log.d(TAG, "showMessage : " + msg + " : " + row.mMsg);
             if (chatFrag != null) {
                 chatFrag.appendChatMessage(row);
             }
         } catch (Exception e) {
+            Log.e(TAG, e.toString());
             Toast.makeText(this, "Show Msg Failed", Toast.LENGTH_SHORT).show();
         }
     }

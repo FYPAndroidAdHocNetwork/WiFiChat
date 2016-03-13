@@ -5,7 +5,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -16,17 +15,27 @@ import android.util.Log;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 
-import static com.colorcloud.wifichat.Constant.*;
+import static com.colorcloud.wifichat.Constant.IMMEDIATE_ACKNOWLEDGEMENT;
+import static com.colorcloud.wifichat.Constant.MSG_BROKEN_CONN;
+import static com.colorcloud.wifichat.Constant.MSG_FINISH_CONNECT;
+import static com.colorcloud.wifichat.Constant.MSG_NEW_CLIENT;
+import static com.colorcloud.wifichat.Constant.MSG_NULL;
+import static com.colorcloud.wifichat.Constant.MSG_PULLIN_DATA;
+import static com.colorcloud.wifichat.Constant.MSG_PUSHOUT_DATA;
+import static com.colorcloud.wifichat.Constant.MSG_REGISTER_ACTIVITY;
+import static com.colorcloud.wifichat.Constant.MSG_SELECT_ERROR;
+import static com.colorcloud.wifichat.Constant.MSG_STARTCLIENT;
+import static com.colorcloud.wifichat.Constant.MSG_STARTSERVER;
 
 public class ConnectionService extends Service {
 
     private static final String TAG = "ConnectionService";
     private static ConnectionService instance = null;
+
     private WorkHandler workHandler;
     private MessageHandler messageHandler;
-
-    ChatActivity chatActivity;    // shall I use weak reference here ?
-    ConnectionManager connectionManager;
+    private ChatActivity chatActivity;    // shall I use weak reference here ?
+    private ConnectionManager connectionManager;
 
     /**
      * @see android.app.Service#onCreate()
@@ -34,25 +43,25 @@ public class ConnectionService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        _initialize();
+        initialize();
     }
 
-    private void _initialize() {
+    private void initialize() {
         if (instance != null) {
-//            Log.d(TAG, "_initialize, already initialized, do nothing.");
             return;
         }
 
         instance = this;
+
         workHandler = new WorkHandler("ConnectionService");
         messageHandler = new MessageHandler(workHandler.getLooper());
-
         connectionManager = new ConnectionManager(this);
+        WiFiDirectBroadcastReceiver.config(connectionManager);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        _initialize();
+        initialize();
         return START_STICKY;
     }
 
@@ -63,10 +72,6 @@ public class ConnectionService extends Service {
     @Override
     public IBinder onBind(Intent arg0) {
         return null;
-    }
-
-    @Override
-    public void onDestroy() {
     }
 
     public Handler getHandler() {
@@ -92,7 +97,7 @@ public class ConnectionService extends Service {
      *
      * @param msg
      */
-    private void processMessage(android.os.Message msg) {
+    private void processMessage(Message msg) {
         switch (msg.what) {
             case MSG_NULL:
                 break;
@@ -111,7 +116,6 @@ public class ConnectionService extends Service {
             case MSG_FINISH_CONNECT:
                 connectionManager.onFinishConnect((SocketChannel) msg.obj);
                 break;
-            // msg coming in
             case MSG_PULLIN_DATA:
                 onPullInData((SocketChannel) msg.obj, msg.getData());
                 break;
@@ -133,7 +137,7 @@ public class ConnectionService extends Service {
      * register the activity that uses this service.
      */
     private void onActivityRegister(ChatActivity activity, int register) {
-//    	Log.d(TAG, "onActivityRegister : activity register itself to service : " + register);
+        // 1: register; else: de-register
         if (register == 1) {
             chatActivity = activity;
         } else {
@@ -144,14 +148,12 @@ public class ConnectionService extends Service {
     /**
      * service handle data in come from socket channel
      */
-    private String onPullInData(SocketChannel schannel, Bundle b) {
-        String data = b.getString("DATA");
+    private void onPullInData(SocketChannel socketChannel, Bundle bundle) {
+        String data = bundle.getString("DATA");
 
         MessageWrapper messageWrapper = MessageWrapper.parseMessageWrapper(data);
         int category = messageWrapper.getCategory();
         String messageBody = messageWrapper.getMessageBody();
-
-        Log.d(TAG, "onPullInData: category is: " + category);
 
         switch (category) {
             case Constant.DEVICE_MAC_ADDRESS:
@@ -175,10 +177,10 @@ public class ConnectionService extends Service {
                 long ack = messageWrapper.getAck();
                 Log.d(TAG, "ack is " + ack);
                 MessageWrapper repliedMessage = new MessageWrapper(IMMEDIATE_ACKNOWLEDGEMENT, "" + ack);
-                ChatActivity.pushOutMessage(repliedMessage.toString());
+                ConnectionService.pushOutMessage(repliedMessage.toString());
 
                 // pub to all client if this device is server.
-                connectionManager.pubDataToAllClients(data, schannel);
+                connectionManager.pubDataToAllClients(data, socketChannel);
 
                 // uncomment below line will enable the App to issue push notification upon receiving messages
                 //showNotification(data);
@@ -194,11 +196,8 @@ public class ConnectionService extends Service {
                 break;
 
             case Constant.ROUTING_ACKNOWLEDGEMENT:
-
                 break;
         }
-
-        return data;
     }
 
     /**
@@ -211,43 +210,19 @@ public class ConnectionService extends Service {
     }
 
     /**
-     * sync call to send data using conn man's channel, as conn man now is blocking on select
+     * post send msg to service to handle it in background.
      */
-    public int connectionSendData(String jsonstring) {
-//    	Log.d(TAG, "connectionSendData : " + jsonstring);
-        new SendDataAsyncTask(connectionManager, jsonstring).execute();
-        return 0;
-        //return connectionManager.clientSendData(jsonstring);
-    }
-
-    /**
-     * write data in an async task to avoid NetworkOnMainThreadException.
-     */
-    public class SendDataAsyncTask extends AsyncTask<Void, Void, Integer> {
-        private String data;
-        private ConnectionManager connman;
-
-        public SendDataAsyncTask(ConnectionManager conn, String jsonstring) {
-            connman = conn;
-            data = jsonstring;
-        }
-
-        @Override
-        protected Integer doInBackground(Void... params) {
-            return connman.pushOutData(data);
-        }
-
-        @Override
-        protected void onPostExecute(Integer result) {
-//			Log.d(TAG, "SendDataAsyncTask : onPostExecute:  " + data + " len: " + result);
-        }
+    public static void pushOutMessage(String formattedString) {
+        Message msg = ConnectionService.getInstance().getHandler().obtainMessage();
+        msg.what = MSG_PUSHOUT_DATA;
+        msg.obj = formattedString;
+        ConnectionService.getInstance().getHandler().sendMessage(msg);
     }
 
     /**
      * show the message in activity
      */
     private void showInActivity(final String msg) {
-//    	Log.d(TAG, "showInActivity : " + msg);
         if (chatActivity != null) {
             chatActivity.runOnUiThread(new Runnable() {
                 @Override
@@ -256,7 +231,6 @@ public class ConnectionService extends Service {
                 }
             });
         } else {
-//    		Log.d(TAG, "showInActivity :  chat activity down, force start !");
             if (((WiFiChatApp) getApplication()).mHomeActivity != null) {
                 ((WiFiChatApp) getApplication()).mHomeActivity.runOnUiThread(new Runnable() {
                     @Override
@@ -269,7 +243,7 @@ public class ConnectionService extends Service {
     }
 
     /**
-     * send a notification upon recv data
+     * send a notification upon receiving data
      */
     public void showNotification(String msg) {
         MessageRow row = MessageRow.parseMsgRow(msg);
