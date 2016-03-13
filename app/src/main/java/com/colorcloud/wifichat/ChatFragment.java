@@ -91,7 +91,7 @@ public class ChatFragment extends ListFragment {
                     final String formattedMsg = messageWrapper.toString();
 
                     if (WiFiDirectActivity.multihopState == false) {
-                        ChatActivity.pushOutMessage(formattedMsg);
+                        ConnectionService.pushOutMessage(formattedMsg);
                     } else {
                         Log.d(TAG, "multi-hop flow");
                         RoutingManager.getInstance().connectionTest(formattedMsg);

@@ -257,7 +257,7 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                 WiFiDirectActivity.multihopState = true;
                 String formattedString = PersistentGroupPeers.getInstance().toString();
                 MessageWrapper messageWrapper = new MessageWrapper(GROUP_MAC_ADDRESS, formattedString);
-                ChatActivity.pushOutMessage(messageWrapper.toString());
+                ConnectionService.pushOutMessage(messageWrapper.toString());
 
                 return true;
 

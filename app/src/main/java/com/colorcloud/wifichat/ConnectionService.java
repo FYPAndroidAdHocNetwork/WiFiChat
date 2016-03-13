@@ -175,7 +175,7 @@ public class ConnectionService extends Service {
                 long ack = messageWrapper.getAck();
                 Log.d(TAG, "ack is " + ack);
                 MessageWrapper repliedMessage = new MessageWrapper(IMMEDIATE_ACKNOWLEDGEMENT, "" + ack);
-                ChatActivity.pushOutMessage(repliedMessage.toString());
+                ConnectionService.pushOutMessage(repliedMessage.toString());
 
                 // pub to all client if this device is server.
                 connectionManager.pubDataToAllClients(data, schannel);
@@ -266,6 +266,16 @@ public class ConnectionService extends Service {
                 });
             }
         }
+    }
+
+    /**
+     * post send msg to service to handle it in background.
+     */
+    public static void pushOutMessage(String formattedString) {
+        Message msg = ConnectionService.getInstance().getHandler().obtainMessage();
+        msg.what = MSG_PUSHOUT_DATA;
+        msg.obj = formattedString;
+        ConnectionService.getInstance().getHandler().sendMessage(msg);
     }
 
     /**

@@ -58,7 +58,7 @@ public class RoutingManager {
                 WiFiDirectBroadcastReceiver.connected = true;
 
                 // push out the message
-                ChatActivity.pushOutMessage(formattedMsg);
+                ConnectionService.pushOutMessage(formattedMsg);
                 // TODO: ack here
 
                 //disconnect

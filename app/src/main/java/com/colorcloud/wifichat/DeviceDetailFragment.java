@@ -211,7 +211,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         // if this connected device is not group owner, send its MAC to owner to construct the peer list
         if (!info.isGroupOwner) {
             MessageWrapper messageWrapper = new MessageWrapper(Constant.DEVICE_MAC_ADDRESS, WiFiDirectActivity.getWiFiDirectMacAddress());
-            ChatActivity.pushOutMessage(messageWrapper.toString());
+            ConnectionService.pushOutMessage(messageWrapper.toString());
         }
 
 //        Log.d(TAG, "onConnectionInfoAvailable: socket connection established, show start chat button ! ");
