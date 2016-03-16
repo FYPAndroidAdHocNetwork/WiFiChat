@@ -33,6 +33,7 @@ public class ConnectionManager {
     // global selector and channels
     private boolean isServer = false;
     private Selector selector = null;
+    private SelectionKey selectionKey = null;
     private ServerSocketChannel serverSocketChannel = null;
     private SocketChannel clientSocketChannel = null;
     String clientAddr = null;
@@ -96,6 +97,7 @@ public class ConnectionManager {
      * start blocking selector monitoring in an async task, infinite loop
      */
     public int startClientSelector(String host) {
+        closeClient();
         closeServer();   // close linger server.
 
         if (clientSocketChannel != null) {
@@ -113,7 +115,7 @@ public class ConnectionManager {
 
             selector = Selector.open();
             clientAddr = clientSocketChannel.socket().getLocalAddress().getHostName();
-            clientSocketChannel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+            selectionKey = clientSocketChannel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
             ((WiFiChatApp) connectionService.getApplication()).setMyAddr(clientAddr);
             Log.d(TAG, "Client Selector started; client addr: " + clientSocketChannel.socket().getLocalAddress().getHostAddress());
         } catch (Exception e) {
@@ -125,6 +127,7 @@ public class ConnectionManager {
 
         // start selector monitoring, blocking
         new SelectorAsyncTask(connectionService, selector).execute();
+        Log.d(TAG, "client selector started");
         return 0;
     }
 
@@ -152,8 +155,8 @@ public class ConnectionManager {
             ((WiFiChatApp) connectionService.getApplication()).setMyAddr(serverAddr);
 
             selector = Selector.open();
-            SelectionKey acceptKey = serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
-            acceptKey.attach("accept_channel");
+            selectionKey = serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+            selectionKey.attach("accept_channel");
             isServer = true;
         } catch (Exception e) {
             Log.e(TAG, "startServerSelector exception: " + e.toString());
@@ -161,6 +164,7 @@ public class ConnectionManager {
         }
 
         new SelectorAsyncTask(connectionService, selector).execute();
+        Log.d(TAG, "server selector started");
         return 0;
     }
 
@@ -178,6 +182,9 @@ public class ConnectionManager {
     private void closeServer() {
         if (serverSocketChannel != null) {
             try {
+                if (selectionKey != null) {
+                    selectionKey.cancel();
+                }
                 serverSocketChannel.close();
                 selector.close();
             } catch (Exception e) {
@@ -190,11 +197,15 @@ public class ConnectionManager {
                 clientChannels.clear();
             }
         }
+        Log.d(TAG, "server closed");
     }
 
     private void closeClient() {
         if (clientSocketChannel != null) {
             try {
+                if (selectionKey != null) {
+                    selectionKey.cancel();
+                }
                 clientSocketChannel.close();
                 selector.close();
             } catch (Exception e) {
@@ -205,6 +216,7 @@ public class ConnectionManager {
                 clientAddr = null;
             }
         }
+        Log.d(TAG, "client closed");
     }
 
     /**
@@ -212,11 +224,13 @@ public class ConnectionManager {
      */
     public void onBrokenConn(SocketChannel socketChannel) {
         //todo why this method keeps being called when connection breaks?
-        String peerAddr = socketChannel.socket().getInetAddress().getHostAddress();
-        if (isServer) {
-            clientChannels.remove(peerAddr);
-        } else {
-            clientSocketChannel = null;
+        if (socketChannel.socket().getInetAddress() != null) {
+            String peerAddr = socketChannel.socket().getInetAddress().getHostAddress();
+            if (isServer) {
+                clientChannels.remove(peerAddr);
+            } else {
+                closeClient();
+            }
         }
     }
 
