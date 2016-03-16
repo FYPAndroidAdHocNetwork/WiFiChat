@@ -48,6 +48,7 @@ public class PersistentGroupPeers {
 
     public void reset() {
         persistentGroupPeers.clear();
+        Log.d(TAG, "persistent group peer list has been cleared");
     }
 
     @Override

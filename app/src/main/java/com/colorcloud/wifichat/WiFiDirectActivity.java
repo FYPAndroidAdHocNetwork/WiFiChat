@@ -269,11 +269,13 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
                 // todo: clear peer list and acks, reset state to conventional state
                 WiFiDirectActivity.multihopState = false;
                 PersistentGroupPeers.getInstance().reset();
+                SendingMessageQueue.getInstance().reset();
                 Toast.makeText(WiFiDirectActivity.this, "Reset", Toast.LENGTH_SHORT).show();
                 return true;
 
             case R.id.btn_debug:
                 PersistentGroupPeers.getInstance().printPersistentGroupPeers();
+                SendingMessageQueue.getInstance().printMessageQueue();
                 Log.d(TAG, "the state is multi-hop state? " + multihopState);
                 return true;
 

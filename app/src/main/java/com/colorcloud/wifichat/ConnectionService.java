@@ -190,6 +190,7 @@ public class ConnectionService extends Service {
             case Constant.IMMEDIATE_ACKNOWLEDGEMENT:
                 long ack1 = Long.parseLong(messageWrapper.getMessageBody());
                 Log.d(TAG, "received ack: " + ack1);
+                SendingMessageQueue.getInstance().acknowledge(ack1);
 
                 break;
 

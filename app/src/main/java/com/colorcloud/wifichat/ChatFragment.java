@@ -90,7 +90,9 @@ public class ChatFragment extends ListFragment {
                     appendChatMessage(messageRow);
                     final String formattedMsg = messageWrapper.toString();
 
+                    //todo: multi-hop state has different behaviors
                     if (WiFiDirectActivity.multihopState == false) {
+                        SendingMessageQueue.getInstance().addToSendingMessageQueue(messageWrapper.getAck(), messageWrapper);
                         ConnectionService.pushOutMessage(formattedMsg);
                     } else {
                         Log.d(TAG, "multi-hop flow");
